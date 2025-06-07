@@ -84,16 +84,10 @@
             border-radius: 0.375rem;
             padding: 1rem;
         }
-        .upload-status {
-            display: none;
-            margin-top: 5px;
-            font-size: 12px;
-        }
-        .upload-status.success {
-            color: green;
-        }
-        .upload-status.error {
-            color: red;
+        .google-maps-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -243,7 +237,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h1 class="text-2xl font-bold text-gray-800">Visão Geral</h1>
                         <button id="changeRiskAreaImage" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition hidden">
-                            <i class="fas fa-image mr-2"></i>Alterar Imagem
+                            <i class="fas fa-image mr-2"></i>Alterar Mapa
                         </button>
                     </div>
                                     
@@ -279,7 +273,7 @@
                                 </div>
                                 <div class="ml-4">
                                     <p class="text-gray-500">Temperatura Média</p>
-                                    <h3 class="text-2xl font-bold">38°C</h3>
+                                    <h3 class="text-2xl font-bold">32°C</h3>
                                 </div>
                             </div>
                         </div>
@@ -337,6 +331,12 @@
                             <h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2>
                             <div class="h-64 rounded-lg overflow-hidden relative">
                                 <div class="map-container rounded-lg" id="riskAreaMap">
+                                    <iframe class="google-maps-iframe" 
+                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr" 
+                                        allowfullscreen="" 
+                                        loading="lazy" 
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                    </iframe>
                                     <div class="map-overlay"></div>
                                     <div class="relative p-4 h-full">
                                         <div class="temperature absolute top-4 right-4 p-3 bg-black/70 text-white rounded-lg">
@@ -358,7 +358,7 @@
                 </div>
                                 
                 <!-- Real Time View -->
-                  <div id="realTime" class="p-0 hidden">
+                <div id="realTime" class="p-0 hidden">
                     <div class="flex flex-col lg:flex-row h-[calc(100vh-73px)]">
                         <!-- Drone List -->
                         <div class="w-full lg:w-1/3 bg-white shadow-inner p-4 overflow-auto">
@@ -376,6 +376,12 @@
                         <!-- Map Area -->
                         <div class="w-full lg:w-2/3 relative">
                             <div class="map-container h-full" id="realTimeMap">
+                                <iframe class="google-maps-iframe" 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
                                 <div class="map-overlay"></div>
                                 <div class="relative h-full p-4">
                                     <div class="absolute top-4 right-4 z-10">
@@ -388,9 +394,6 @@
                                             </button>
                                             <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
                                                 <i class="fas fa-compress-alt"></i>
-                                            </button>
-                                            <button id="changeRealTimeMapImage" class="bg-primary text-white px-3 py-1 rounded-lg text-sm hover:bg-secondary transition hidden">
-                                                <i class="fas fa-image"></i> Map Image
                                             </button>
                                         </div>
                                     </div>
@@ -487,7 +490,6 @@
                                                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
                                                         <p class="text-sm text-gray-600">Arraste ou clique para enviar imagem</p>
                                                         <input type="file" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer" id="historyImage1Input">
-                                                        <div class="upload-status" id="historyImage1Status"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -509,7 +511,6 @@
                                                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
                                                         <p class="text-sm text-gray-600">Arraste ou clique para enviar imagem</p>
                                                         <input type="file" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer" id="historyImage2Input">
-                                                        <div class="upload-status" id="historyImage2Status"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -643,7 +644,6 @@
                     <h4 class="font-medium mb-2">Vídeo Normal</h4>
                     <div class="video-input-container">
                         <input type="file" accept="video/*" id="normalVideoInput" class="mb-2">
-                        <div class="upload-status" id="normalVideoStatus"></div>
                         <p class="text-sm text-gray-500">Ou insira URL do vídeo:</p>
                         <input type="text" id="normalVideoUrl" placeholder="https://example.com/video.mp4" class="w-full px-4 py-2 border rounded-lg mt-1">
                     </div>
@@ -652,7 +652,6 @@
                     <h4 class="font-medium mb-2">Vídeo Térmico</h4>
                     <div class="video-input-container">
                         <input type="file" accept="video/*" id="thermalVideoInput" class="mb-2">
-                        <div class="upload-status" id="thermalVideoStatus"></div>
                         <p class="text-sm text-gray-500">Ou insira URL do vídeo:</p>
                         <input type="text" id="thermalVideoUrl" placeholder="https://example.com/thermal.mp4" class="w-full px-4 py-2 border rounded-lg mt-1">
                     </div>
@@ -661,30 +660,6 @@
             <div class="p-4 border-t flex justify-end space-x-3">
                 <button id="cancelConfigureVideos" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
                 <button id="saveConfiguredVideos" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Change Map Image Modal -->
-    <div id="changeMapImageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white rounded-lg w-full max-w-md">
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-semibold">Alterar Imagem do Mapa</h3>
-            </div>
-            <div class="p-4">
-                <div class="mb-4">
-                    <p class="text-sm text-gray-600 mb-2">Selecione uma nova imagem para o mapa:</p>
-                    <input type="file" accept="image/*" id="mapImageFileInput" class="w-full">
-                    <div class="upload-status" id="mapImageStatus"></div>
-                </div>
-                <div class="mb-4">
-                    <p class="text-sm text-gray-600 mb-2">Ou insira a URL de uma imagem:</p>
-                    <input type="text" id="mapImageUrlInput" placeholder="https://example.com/map.jpg" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-            </div>
-            <div class="p-4 border-t flex justify-end space-x-3">
-                <button id="cancelChangeMapImage" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
-                <button id="saveMapImage" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button>
             </div>
         </div>
     </div>
@@ -782,9 +757,6 @@
 
         ];
 
-        let realTimeMapImage = "https://www.google.com/maps/place/Bebedouro+-+SP/@-20.9093518,-48.4167957,2357m/data=!3m1!1e3!4m6!3m5!1s0x94bbe3ff3103bc1f:0x8eb5b8084c6185b5!8m2!3d-20.9318346!4d-48.4942802!16zL20vMDN5c3Ew!5m1!1e8?entry=ttu&g_ep=EgoyMDI1MDYwNC4wIKXMDSoASAFQAw%3D%3D";
-        let riskAreaMapImage = "https://www.google.com/maps/place/Bebedouro+-+SP/@-20.9093518,-48.4167957,2357m/data=!3m1!1e3!4m6!3m5!1s0x94bbe3ff3103bc1f:0x8eb5b8084c6185b5!8m2!3d-20.9318346!4d-48.4942802!16zL20vMDN5c3Ew!5m1!1e8?entry=ttu&g_ep=EgoyMDI1MDYwNC4wIKXMDSoASAFQAw%3D%3D";
-
         let historyEvents = {
             '15/10/2023': {
                 events: [
@@ -828,24 +800,6 @@
             thermalVideo: ""
         };
 
-        // Server-side simulation for image upload
-        function simulateServerUpload(file, callback) {
-            // This is a simulation - in a real app, you would send the file to your server
-            setTimeout(() => {
-                // Simulate a random chance of failure (20%)
-                const success = Math.random() > 0.2;
-                
-                if (success) {
-                    // In a real app, the server would return the path to the saved file
-                    const fileName = `image_${Date.now()}_${file.name}`;
-                    const filePath = `C:\\site\\imagem\\${fileName}`;
-                    callback(true, filePath);
-                } else {
-                    callback(false, "Erro no upload. Tente novamente.");
-                }
-            }, 1500);
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             // Get DOM elements
             const loginScreen = document.getElementById('loginScreen');
@@ -858,21 +812,8 @@
             const adminPanelLink = document.getElementById('adminPanelLink');
             const changeRiskAreaImageBtn = document.getElementById('changeRiskAreaImage');
             const configureDronesBtn = document.getElementById('configureDronesBtn');
-            const changeRealTimeMapImageBtn = document.getElementById('changeRealTimeMapImage');
             const configureVideosBtn = document.getElementById('configureVideosBtn');
             const configureHistoryImagesBtn = document.getElementById('configureHistoryImagesBtn');
-
-            // Initialize maps
-            document.getElementById('riskAreaMap').style.backgroundImage = `url(${riskAreaMapImage})`;
-            document.getElementById('riskAreaMap').style.backgroundSize = 'cover';
-            document.getElementById('riskAreaMap').style.backgroundPosition = 'center';
-            document.getElementById('riskAreaMap').style.backgroundRepeat = 'no-repeat';
-            
-            document.getElementById('realTimeMap').style.backgroundImage = `url(${realTimeMapImage})`;
-            document.getElementById('realTimeMap').style.backgroundSize = 'cover';
-            document.getElementById('realTimeMap').style.backgroundPosition = 'center';
-            document.getElementById('realTimeMap').style.backgroundRepeat = 'no-repeat';
-
 
             // Login functionality
             loginForm.addEventListener('submit', function(e) {
@@ -895,16 +836,10 @@
                         adminPanelLink.classList.remove('hidden');
                         changeRiskAreaImageBtn.classList.remove('hidden');
                         configureDronesBtn.classList.remove('hidden');
-                        changeRealTimeMapImageBtn.classList.remove('hidden');
                         configureVideosBtn.classList.remove('hidden');
                         configureHistoryImagesBtn.classList.remove('hidden');
                     } else {
                         adminPanelLink.classList.add('hidden');
-                        changeRiskAreaImageBtn.classList.add('hidden');
-                        configureDronesBtn.classList.add('hidden');
-                        changeRealTimeMapImageBtn.classList.add('hidden');
-                        configureVideosBtn.classList.add('hidden');
-                        configureHistoryImagesBtn.classList.add('hidden');
                     }
 
                     // Show dashboard by default
@@ -929,13 +864,6 @@
                 view.addEventListener('click', function(e) {
                     e.preventDefault();
                     const viewName = this.getAttribute('data-view');
-                    
-                    // Check if user has permission to access admin panel
-                    if (viewName === 'adminPanel' && !(currentUser.role === 'master' || currentUser.role === 'admin')) {
-                        alert('Acesso negado. Somente administradores podem acessar esta área.');
-                        return;
-                    }
-                    
                     showView(viewName);
                     
                     // Update active menu styling
@@ -967,109 +895,11 @@
                         renderHistoryDates();
                         break;
                     case 'adminPanel':
-                        if (currentUser.role === 'master' || currentUser.role === 'admin') {
-                            renderUsersTable();
-                        } else {
-                            alert('Acesso negado. Somente administradores podem acessar esta área.');
-                            showView('dashboard');
-                        }
+                        renderUsersTable();
                         break;
                     case 'towerCamera':
                         renderTowerVideos();
                         break;
-                }
-            }
-
-            // Risk area image change functionality
-            changeRiskAreaImageBtn.addEventListener('click', function() {
-                document.getElementById('changeMapImageModal').classList.remove('hidden');
-                document.getElementById('mapImageFileInput').onchange = function(e) {
-                    if(e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const statusElement = document.getElementById('mapImageStatus');
-                        
-                        statusElement.textContent = "Enviando imagem...";
-                        statusElement.className = "upload-status";
-                        statusElement.style.display = "block";
-                        
-                        simulateServerUpload(file, function(success, result) {
-                            if (success) {
-                                statusElement.textContent = "Imagem enviada com sucesso! Salve para confirmar.";
-                                statusElement.className = "upload-status success";
-                                riskAreaMapImage = result;
-                                document.getElementById('mapImageUrlInput').value = '';
-                            } else {
-                                statusElement.textContent = result;
-                                statusElement.className = "upload-status error";
-                            }
-                        });
-                    }
-                };
-            });
-
-            // Real-time map image change functionality
-            changeRealTimeMapImageBtn.addEventListener('click', function() {
-                document.getElementById('changeMapImageModal').classList.remove('hidden');
-                document.getElementById('mapImageFileInput').onchange = function(e) {
-                    if(e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const statusElement = document.getElementById('mapImageStatus');
-                        
-                        statusElement.textContent = "Enviando imagem...";
-                        statusElement.className = "upload-status";
-                        statusElement.style.display = "block";
-                        
-                        simulateServerUpload(file, function(success, result) {
-                            if (success) {
-                                statusElement.textContent = "Imagem enviada com sucesso! Salve para confirmar.";
-                                statusElement.className = "upload-status success";
-                                realTimeMapImage = result;
-                                document.getElementById('mapImageUrlInput').value = '';
-                            } else {
-                                statusElement.textContent = result;
-                                statusElement.className = "upload-status error";
-                            }
-                        });
-                    }
-                };
-            });
-
-            // Save map image functionality
-            document.getElementById('saveMapImage').addEventListener('click', function() {
-                const urlInput = document.getElementById('mapImageUrlInput').value.trim();
-                
-                if(urlInput) {
-                    if(changeRiskAreaImageBtn.classList.contains('hidden') === false) {
-                        riskAreaMapImage = urlInput;
-                    } else {
-                        realTimeMapImage = urlInput;
-                    }
-                }
-                
-                updateMapImages();
-                document.getElementById('changeMapImageModal').classList.add('hidden');
-                document.getElementById('mapImageFileInput').value = '';
-                document.getElementById('mapImageUrlInput').value = '';
-                document.getElementById('mapImageStatus').style.display = "none";
-            });
-
-            // Cancel map image change
-            document.getElementById('cancelChangeMapImage').addEventListener('click', function() {
-                document.getElementById('changeMapImageModal').classList.add('hidden');
-                document.getElementById('mapImageFileInput').value = '';
-                document.getElementById('mapImageUrlInput').value = '';
-                document.getElementById('mapImageStatus').style.display = "none";
-            });
-
-            function updateMapImages() {
-                const riskAreaMap = document.getElementById('riskAreaMap');
-                if(riskAreaMap) {
-                    riskAreaMap.style.backgroundImage = `url(${riskAreaMapImage})`;
-                }
-                
-                const realTimeMap = document.getElementById('realTimeMap');
-                if(realTimeMap) {
-                    realTimeMap.style.backgroundImage = `url(${realTimeMapImage})`;
                 }
             }
 
@@ -1293,73 +1123,42 @@
                 document.getElementById('thermalVideoUrl').value = towerVideos.thermalVideo;
             });
 
-            // Handle video uploads
-            document.getElementById('normalVideoInput').addEventListener('change', function(e) {
-                if(e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const statusElement = document.getElementById('normalVideoStatus');
-                    
-                    statusElement.textContent = "Enviando vídeo...";
-                    statusElement.className = "upload-status";
-                    statusElement.style.display = "block";
-                    
-                    simulateServerUpload(file, function(success, result) {
-                        if (success) {
-                            statusElement.textContent = "Vídeo enviado com sucesso! Salve para confirmar.";
-                            statusElement.className = "upload-status success";
-                            document.getElementById('normalVideoUrl').value = result;
-                        } else {
-                            statusElement.textContent = result;
-                            statusElement.className = "upload-status error";
-                        }
-                    });
-                }
-            });
-
-            document.getElementById('thermalVideoInput').addEventListener('change', function(e) {
-                if(e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const statusElement = document.getElementById('thermalVideoStatus');
-                    
-                    statusElement.textContent = "Enviando vídeo...";
-                    statusElement.className = "upload-status";
-                    statusElement.style.display = "block";
-                    
-                    simulateServerUpload(file, function(success, result) {
-                        if (success) {
-                            statusElement.textContent = "Vídeo enviado com sucesso! Salve para confirmar.";
-                            statusElement.className = "upload-status success";
-                            document.getElementById('thermalVideoUrl').value = result;
-                        } else {
-                            statusElement.textContent = result;
-                            statusElement.className = "upload-status error";
-                        }
-                    });
-                }
-            });
-
             document.getElementById('saveConfiguredVideos').addEventListener('click', function() {
                 const normalVideoUrl = document.getElementById('normalVideoUrl').value.trim();
                 const thermalVideoUrl = document.getElementById('thermalVideoUrl').value.trim();
                 
-                if(normalVideoUrl) {
+                // Handle file upload for normal video
+                const normalVideoFile = document.getElementById('normalVideoInput').files[0];
+                if(normalVideoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        towerVideos.normalVideo = e.target.result;
+                        updateTowerVideos();
+                    };
+                    reader.readAsDataURL(normalVideoFile);
+                } else if(normalVideoUrl) {
                     towerVideos.normalVideo = normalVideoUrl;
                 }
                 
-                if(thermalVideoUrl) {
+                // Handle file upload for thermal video
+                const thermalVideoFile = document.getElementById('thermalVideoInput').files[0];
+                if(thermalVideoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        towerVideos.thermalVideo = e.target.result;
+                        updateTowerVideos();
+                    };
+                    reader.readAsDataURL(thermalVideoFile);
+                } else if(thermalVideoUrl) {
                     towerVideos.thermalVideo = thermalVideoUrl;
                 }
                 
                 updateTowerVideos();
                 document.getElementById('configureVideosModal').classList.add('hidden');
-                document.getElementById('normalVideoStatus').style.display = "none";
-                document.getElementById('thermalVideoStatus').style.display = "none";
             });
 
             document.getElementById('cancelConfigureVideos').addEventListener('click', function() {
                 document.getElementById('configureVideosModal').classList.add('hidden');
-                document.getElementById('normalVideoStatus').style.display = "none";
-                document.getElementById('thermalVideoStatus').style.display = "none";
             });
 
             function renderTowerVideos() {
@@ -1525,36 +1324,23 @@
             function setupHistoryImageUploads(date) {
                 const image1Input = document.getElementById('historyImage1Input');
                 const image2Input = document.getElementById('historyImage2Input');
-                const status1Element = document.getElementById('historyImage1Status');
-                const status2Element = document.getElementById('historyImage2Status');
                 
                 image1Input.addEventListener('change', function(e) {
                     if(e.target.files.length > 0) {
                         const file = e.target.files[0];
-                        
-                        status1Element.textContent = "Enviando imagem...";
-                        status1Element.className = "upload-status";
-                        status1Element.style.display = "block";
-                        
-                        simulateServerUpload(file, function(success, result) {
-                            if (success) {
-                                status1Element.textContent = "Imagem enviada com sucesso!";
-                                status1Element.className = "upload-status success";
-                                
-                                historyEvents[date].events[0].image = result;
-                                
-                                const container = document.getElementById('historyImage1Container');
-                                container.innerHTML = '';
-                                
-                                const img = document.createElement('img');
-                                img.src = result;
-                                img.className = 'w-full h-full object-cover';
-                                container.appendChild(img);
-                            } else {
-                                status1Element.textContent = result;
-                                status1Element.className = "upload-status error";
-                            }
-                        });
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            historyEvents[date].events[0].image = event.target.result;
+                            
+                            const container = document.getElementById('historyImage1Container');
+                            container.innerHTML = '';
+                            
+                            const img = document.createElement('img');
+                            img.src = event.target.result;
+                            img.className = 'w-full h-full object-cover';
+                            container.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
                     }
                 });
                 
@@ -1562,30 +1348,19 @@
                     image2Input.addEventListener('change', function(e) {
                         if(e.target.files.length > 0) {
                             const file = e.target.files[0];
-                            
-                            status2Element.textContent = "Enviando imagem...";
-                            status2Element.className = "upload-status";
-                            status2Element.style.display = "block";
-                            
-                            simulateServerUpload(file, function(success, result) {
-                                if (success) {
-                                    status2Element.textContent = "Imagem enviada com sucesso!";
-                                    status2Element.className = "upload-status success";
-                                    
-                                    historyEvents[date].events[1].image = result;
-                                    
-                                    const container = document.getElementById('historyImage2Container');
-                                    container.innerHTML = '';
-                                    
-                                    const img = document.createElement('img');
-                                    img.src = result;
-                                    img.className = 'w-full h-full object-cover';
-                                    container.appendChild(img);
-                                } else {
-                                    status2Element.textContent = result;
-                                    status2Element.className = "upload-status error";
-                                }
-                            });
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                historyEvents[date].events[1].image = event.target.result;
+                                
+                                const container = document.getElementById('historyImage2Container');
+                                container.innerHTML = '';
+                                
+                                const img = document.createElement('img');
+                                img.src = event.target.result;
+                                img.className = 'w-full h-full object-cover';
+                                container.appendChild(img);
+                            };
+                            reader.readAsDataURL(file);
                         }
                     });
                 }
@@ -1636,10 +1411,9 @@
                             <button onclick="editUser(${user.id})" class="text-secondary hover:text-primary mr-3">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            ${user.role !== 'master' || currentUser.role === 'master' ? `
                             <button onclick="deleteUser(${user.id})" class="text-danger hover:text-red-700">
                                 <i class="fas fa-trash"></i>
-                            </button>` : ''}
+                            </button>
                         </td>
                     `;
                     
@@ -1681,12 +1455,6 @@
                     // Update existing user
                     const index = users.findIndex(u => u.id == id);
                     if(index !== -1) {
-                        // Don't allow changing master user role if not master
-                        if (users[index].role === 'master' && currentUser.role !== 'master') {
-                            alert('Apenas usuários master podem modificar outros usuários master.');
-                            return;
-                        }
-                        
                         users[index] = {
                             ...users[index],
                             username,
@@ -1716,23 +1484,8 @@
             }
             
             function deleteUser(id) {
-                const user = users.find(u => u.id === id);
-                if (!user) return;
-                
-                // Don't allow deleting master users unless current user is master
-                if (user.role === 'master' && currentUser.role !== 'master') {
-                    alert('Apenas usuários master podem deletar outros usuários master.');
-                    return;
-                }
-                
-                // Don't allow deleting yourself
-                if (user.id === currentUser.id) {
-                    alert('Você não pode deletar seu próprio usuário.');
-                    return;
-                }
-                
-                if(confirm(`Tem certeza que deseja excluir o usuário "${user.username}"?`)) {
-                    users = users.filter(u => u.id !== id);
+                if(confirm('Tem certeza que deseja excluir este usuário?')) {
+                    users = users.filter(user => user.id !== id);
                     renderUsersTable();
                 }
             }
@@ -1740,27 +1493,11 @@
             function editUser(id) {
                 const user = users.find(u => u.id === id);
                 if(user) {
-                    // Don't allow editing master users unless current user is master
-                    if (user.role === 'master' && currentUser.role !== 'master') {
-                        alert('Apenas usuários master podem editar outros usuários master.');
-                        return;
-                    }
-                    
                     document.getElementById('modalTitle').textContent = 'Editar Usuário';
                     document.getElementById('userId').value = user.id;
                     document.getElementById('usernameInput').value = user.username;
                     document.getElementById('passwordInput').value = user.password;
-                    
-                    const roleInput = document.getElementById('roleInput');
-                    roleInput.value = user.role;
-                    
-                    // Disable role change for master users unless current user is master
-                    if (user.role === 'master' && currentUser.role !== 'master') {
-                        roleInput.disabled = true;
-                    } else {
-                        roleInput.disabled = false;
-                    }
-                    
+                    document.getElementById('roleInput').value = user.role;
                     userModal.classList.remove('hidden');
                 }
             }
