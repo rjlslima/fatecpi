@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DroneGuard - Gestão de Combate a Incêndios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d5d3f',
+                        secondary: '#2d9c6a',
+                        danger: '#e53e3e',
+                        warning: '#dd6b20',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+        .login-bg {
+            background: url('https://images.unsplash.com/photo-1523309994053-aca3bc0a2304?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center;
+            background-size: cover;
+        }
+        .map-container {
+            position: relative;
+            height: 100%;
+        }
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .temperature {
+            background: linear-gradient(45deg, #c70039, #ff5733, #ffc300);
+            animation: heat-pulse 2s infinite alternate;
+        }
+        .drone-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        @keyframes heat-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(199, 0, 57, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(199, 0, 57, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(199, 0, 57, 0); }
+        }
+        .active-menu {
+            position: relative;
+        }
+        .active-menu:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background-color: #2d9c6a;
+            border-radius: 3px;
+        }
+        .image-upload-container {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .image-upload-container:hover {
+            border-color: #6c757d;
+        }
+        .video-input-container {
+            background: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1rem;
+        }
+        .upload-status {
+            display: none;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .upload-status.success {
+            color: green;
+        }
+        .upload-status.error {
+            color: red;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div class="login-bg h-48 flex items-end p-6">
+            <div class="bg-black/40 p-4 rounded-lg backdrop-blur-sm w-full">
+                <h1 class="text-3xl font-bold text-white text-center">
+                    <i class="fas fa-fire mr-2 text-red-500"></i>DroneGuard
+                </h1>
+                <p class="text-center text-white/90 mt-1">Gestão de Drones para Combate a Incêndios</p>
+            </div>
+        </div>
+                
+        <form id="loginForm" class="p-8">
+            <div class="mb-6">
+                <label for="username" class="block text-gray-700 font-medium mb-2">Usuário - fatec</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-400">&nbsp;</i>
+                    </div>
+                    <input type="text" id="username" 
+                        class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-secondary" 
+                        placeholder="Digite seu usuário" required>
+                </div>
+            </div>
+                        
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 font-medium mb-2">Senha - fatec</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" 
+                        class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-secondary" 
+                        placeholder="Digite sua senha" required>
+                </div>
+            </div>
+                        
+            <div class="mb-6 flex items-center">
+                <input type="checkbox" id="remember" class="mr-2">
+                <label for="remember" class="text-gray-600">Lembrar-me</label>
+            </div>
+                        
+            <button type="submit" 
+                class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300">
+                Entrar <i class="fas fa-sign-in-alt ml-2"></i>
+            </button>
+                        
+            <div class="mt-6 text-center">
+                <a href="#" class="text-secondary hover:text-primary text-sm">Esqueceu a senha?</a>
+            </div>
+        </form>
+                
+        <div class="bg-gray-100 p-4 text-center text-sm text-gray-600">
+          <p>&copy; 2023 DroneGuard System. Todos os direitos reservados.</p>
+        </div>
+    </div>
+        
+    <!-- Main Application - Initially Hidden -->
+    <div id="mainApp" class="w-full h-screen bg-gray-50 overflow-hidden hidden">
+        <!-- Header -->
+        <div class="w-full bg-white shadow-sm flex items-center justify-between p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-fire text-white text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h1 class="text-xl font-bold text-gray-800">DroneGuard</h1>
+                    <p class="text-xs text-gray-500">Sistema de Gestão de Combate a Incêndios</p>
+                </div>
+            </div>
+                        
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="p-2 text-gray-600 hover:text-secondary">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <span class="absolute top-0 right-0 w-3 h-3 bg-danger rounded-full"></span>
+                </div>
+                                
+                <div class="flex items-center">
+                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-800" id="currentUsername">Administrador</p>
+                        <button id="logoutBtn" class="text-xs text-danger font-medium hover:underline">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        <div class="flex h-[calc(100vh-73px)]">
+            <!-- Sidebar -->
+            <div class="w-64 bg-white shadow-lg">
+                <nav class="mt-6">
+                    <ul>
+                        <li>
+                            <a href="#" data-view="dashboard" class="flex items-center p-4 text-gray-600 hover:bg-gray-100 active-menu">
+                                <i class="fas fa-home mr-3 text-secondary"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-view="realTime" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
+                                <i class="fas fa-map-marked-alt mr-3 text-secondary"></i>
+                                <span>Monitoramento em Tempo Real</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-view="towerCamera" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
+                                <i class="fas fa-video mr-3 text-secondary"></i>
+                                <span>Câmera de Torre</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-view="history" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
+                                <i class="fas fa-calendar-day mr-3 text-secondary"></i>
+                                <span>Histórico</span>
+                            </a>
+                        </li>
+                        <li id="adminPanelLink" class="hidden">
+                            <a href="#" data-view="adminPanel" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
+                                <i class="fas fa-users-cog mr-3 text-secondary"></i>
+                                <span>Painel Administrativo</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                                
+                <div class="absolute bottom-0 w-64 p-4 border-t border-gray-200">
+                    <div class="bg-green-50 rounded-lg p-3 border border-green-200">
+                        <p class="text-xs text-center text-green-800">
+                            <i class="fas fa-circle text-green-500 text-[8px] mr-1"></i>
+                            Todos os sistemas operacionais
+                        </p>
+                    </div>
+                </div>
+            </div>
+                        
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto">
+                <!-- Dashboard View -->
+                <div id="dashboard" class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Visão Geral</h1>
+                        <button id="changeRiskAreaImage" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition hidden">
+                            <i class="fas fa-image mr-2"></i>Alterar Imagem
+                        </button>
+                    </div>
+                                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-fire text-danger text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-gray-500">Incêndios Ativos</p>
+                                    <h3 class="text-2xl font-bold">2</h3>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-fire-extinguisher text-primary text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-gray-500">Drones Disponíveis</p>
+                                    <h3 class="text-2xl font-bold">7/7</h3>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-temperature-high text-warning text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-gray-500">Temperatura Média</p>
+                                    <h3 class="text-2xl font-bold">38°C</h3>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt text-secondary text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-gray-500">Resposta Média</p>
+                                    <h3 class="text-2xl font-bold">5.2 min</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <h2 class="text-lg font-semibold mb-4">Atividade Recente</h2>
+                            <div class="space-y-4">
+                                <div class="flex items-center border-b pb-3">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-play text-green-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="font-medium">Drone VTNT-03 iniciou combate</p>
+                                        <p class="text-sm text-gray-500">2 minutos atrás</p>
+                                    </div>
+                                </div>
+                                                                
+                                <div class="flex items-center border-b pb-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-map-marked-alt text-blue-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="font-medium">Área de risco identificada</p>
+                                        <p class="text-sm text-gray-500">15 minutos atrás</p>
+                                    </div>
+                                </div>
+                                                                
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-sync-alt text-purple-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="font-medium">Drone RFLP-02 recarregado</p>
+                                        <p class="text-sm text-gray-500">30 minutos atrás</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2>
+                            <div class="h-64 rounded-lg overflow-hidden relative">
+                                <div class="map-container rounded-lg" id="riskAreaMap">
+                                    <div class="map-overlay"></div>
+                                    <div class="relative p-4 h-full">
+                                        <div class="temperature absolute top-4 right-4 p-3 bg-black/70 text-white rounded-lg">
+                                            <span class="font-bold">38°C</span> Temperatura
+                                        </div>
+                                        <div class="absolute bottom-4 left-4">
+                                            <div class="bg-white p-2 rounded-lg">
+                                                <div class="flex items-center">
+                                                    <div class="w-3 h-3 rounded-full bg-danger mr-2"></div>
+                                                    <span class="text-xs font-medium">Zona crítica</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                
+                <!-- Real Time View -->
+                  <div id="realTime" class="p-0 hidden">
+                    <div class="flex flex-col lg:flex-row h-[calc(100vh-73px)]">
+                        <!-- Drone List -->
+                        <div class="w-full lg:w-1/3 bg-white shadow-inner p-4 overflow-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-bold text-gray-800">Frota de Combate</h2>
+                                <button id="configureDronesBtn" class="bg-primary text-white px-3 py-1 rounded-lg text-sm hover:bg-secondary transition hidden">
+                                    <i class="fas fa-cog"></i> Configurar
+                                </button>
+                            </div>
+                            <div class="space-y-4" id="droneListContainer">
+                                <!-- Drone elements will be inserted here by JavaScript -->
+                            </div>
+                        </div>
+                                                
+                        <!-- Map Area -->
+                        <div class="w-full lg:w-2/3 relative">
+                            <div class="map-container h-full" id="realTimeMap">
+                                <div class="map-overlay"></div>
+                                <div class="relative h-full p-4">
+                                    <div class="absolute top-4 right-4 z-10">
+                                        <div class="flex space-x-2">
+                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
+                                                <i class="fas fa-compress-alt"></i>
+                                            </button>
+                                            <button id="changeRealTimeMapImage" class="bg-primary text-white px-3 py-1 rounded-lg text-sm hover:bg-secondary transition hidden">
+                                                <i class="fas fa-image"></i> Map Image
+                                            </button>
+                                        </div>
+                                    </div>
+                                                                        
+                                    <div class="temperature absolute top-16 right-4 p-3 bg-black/70 text-white rounded-lg z-10">
+                                        <span class="font-bold">38°C</span> Temperatura Média
+                                    </div>
+                                                                        
+                                    <!-- Drone markers will be inserted here by JavaScript -->
+                                                                        
+                                    <div class="absolute bottom-4 left-4">
+                                        <div class="flex space-x-2">
+                                            <div class="bg-white p-2 rounded-lg flex items-center">
+                                                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                                <span class="text-xs font-medium">Drones no Ar</span>
+                                            </div>
+                                            <div class="bg-white p-2 rounded-lg flex items-center">
+                                                <div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                                                <span class="text-xs font-medium">VTNTs</span>
+                                            </div>
+                                            <div class="bg-white p-2 rounded-lg flex items-center">
+                                                <div class="w-3 h-3 rounded-full bg-danger mr-2"></div>
+                                                <span class="text-xs font-medium">Focos Ativos</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                
+                <!-- Tower Camera View -->
+                <div id="towerCamera" class="p-6 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1>
+                        <button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition hidden">
+                            <i class="fas fa-cog mr-2"></i>Configurar Vídeos
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="towerVideosContainer">
+                        <div class="bg-white rounded-xl shadow p-4">
+                            <h2 class="text-lg font-semibold mb-4">Visão Normal</h2>
+                            <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
+                                <video controls class="w-full h-full object-cover" id="normalVideo">
+                                    <source src="" type="video/mp4">
+                                    Seu navegador não suporta o elemento de vídeo.
+                                </video>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-4">
+                            <h2 class="text-lg font-semibold mb-4">Visão Térmica</h2>
+                            <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
+                                <video controls class="w-full h-full object-cover" id="thermalVideo">
+                                    <source src="" type="video/mp4">
+                                    Seu navegador não suporta o elemento de vídeo.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History View -->
+                <div id="history" class="p-6 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Histórico de Incidentes</h1>
+                        <button id="configureHistoryImagesBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition hidden">
+                            <i class="fas fa-images mr-2"></i>Configurar Imagens
+                        </button>
+                    </div>
+                                    
+                    <div class="flex flex-col lg:flex-row">
+                        <!-- Timeline -->
+                        <div class="w-full lg:w-1/4 pr-0 lg:pr-4 mb-6 lg:mb-0">
+                            <div class="bg-white rounded-xl shadow p-4">
+                                <h2 class="text-lg font-semibold mb-4">Data dos Eventos</h2>
+                                <div class="space-y-2 max-h-[400px] overflow-y-auto" id="historyDatesList">
+                                    <!-- Dates will be inserted here by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                                                
+                        <!-- Event details -->
+                        <div class="flex-1">
+                            <div class="bg-white rounded-xl shadow p-6">
+                                <h2 class="text-lg font-semibold mb-4" id="historyDateTitle">Selecione uma data</h2>
+                                <div id="historyEventsContainer" class="hidden">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <div class="h-48 bg-gray-100 rounded-lg overflow-hidden relative" id="historyImage1Container">
+                                                <div class="image-upload-container h-full flex items-center justify-center hidden">
+                                                    <div>
+                                                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                                        <p class="text-sm text-gray-600">Arraste ou clique para enviar imagem</p>
+                                                        <input type="file" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer" id="historyImage1Input">
+                                                        <div class="upload-status" id="historyImage1Status"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <select id="historyEvent1Type" class="w-full p-2 border rounded-lg mb-2 hidden">
+                                                    <option value="safe">Sem incidentes</option>
+                                                    <option value="fire">Incêndio</option>
+                                                </select>
+                                                <div id="historyEvent1Details" class="hidden">
+                                                    <!-- Event details will be inserted here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div class="h-48 bg-gray-100 rounded-lg overflow-hidden relative" id="historyImage2Container">
+                                                <div class="image-upload-container h-full flex items-center justify-center hidden">
+                                                    <div>
+                                                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                                        <p class="text-sm text-gray-600">Arraste ou clique para enviar imagem</p>
+                                                        <input type="file" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer" id="historyImage2Input">
+                                                        <div class="upload-status" id="historyImage2Status"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <select id="historyEvent2Type" class="w-full p-2 border rounded-lg mb-2 hidden">
+                                                    <option value="safe">Sem incidentes</option>
+                                                    <option value="fire">Incêndio</option>
+                                                </select>
+                                                <div id="historyEvent2Details" class="hidden">
+                                                    <!-- Event details will be inserted here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-blue-50 p-4 rounded-lg hidden" id="historySummarySection">
+                                        <h3 class="font-medium mb-2">Resumo do Dia</h3>
+                                        <p id="historySummaryText"></p>
+                                    </div>
+                                </div>
+                                
+                                <div id="noHistorySelected" class="text-center py-10 text-gray-500">
+                                    <i class="fas fa-calendar-day text-4xl mb-3 text-secondary/40"></i>
+                                    <p>Selecione uma data para visualizar os eventos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                
+                <div id="adminPanel" class="p-6 hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-6">Painel Administrativo</h1>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <div class="p-4 bg-gray-50 border-b">
+                            <button id="addUserBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                                <i class="fas fa-plus mr-2"></i>Adicionar Usuário
+                            </button>
+                        </div>
+                                                
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nível de Acesso</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
+                                    <!-- Users will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-lg w-full max-w-md">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold" id="modalTitle">Adicionar Usuário</h3>
+            </div>
+            <div class="p-4">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Usuário</label>
+                        <input type="text" id="usernameInput" class="w-full px-4 py-2 border rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="passwordInput" class="w-full px-4 py-2 border rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Nível de Acesso</label>
+                        <select id="roleInput" class="w-full px-4 py-2 border rounded-lg" required>
+                            <option value="master">Master</option>
+                            <option value="admin">Administrador</option>
+                            <option value="viewer">Visualizador</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button id="cancelModal" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                    Cancelar
+                </button>
+                <button id="saveUser" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configure Drones Modal -->
+    <div id="configureDronesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold">Configurar Drones</h3>
+            </div>
+            <div class="p-4">
+                <div id="configuredDronesContainer" class="space-y-4">
+                    <!-- Drones will be inserted here -->
+                </div>
+                <button id="addNewDroneBtn" class="mt-4 bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Drone
+                </button>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button id="cancelConfigureDrones" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                    Cancelar
+                </button>
+                <button id="saveConfiguredDrones" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">
+                    Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configure Videos Modal -->
+    <div id="configureVideosModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-lg w-full max-w-md">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold">Configurar Vídeos da Torre</h3>
+            </div>
+            <div class="p-4 space-y-6">
+                <div>
+                    <h4 class="font-medium mb-2">Vídeo Normal</h4>
+                    <div class="video-input-container">
+                        <input type="file" accept="video/*" id="normalVideoInput" class="mb-2">
+                        <div class="upload-status" id="normalVideoStatus"></div>
+                        <p class="text-sm text-gray-500">Ou insira URL do vídeo:</p>
+                        <input type="text" id="normalVideoUrl" placeholder="https://example.com/video.mp4" class="w-full px-4 py-2 border rounded-lg mt-1">
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2">Vídeo Térmico</h4>
+                    <div class="video-input-container">
+                        <input type="file" accept="video/*" id="thermalVideoInput" class="mb-2">
+                        <div class="upload-status" id="thermalVideoStatus"></div>
+                        <p class="text-sm text-gray-500">Ou insira URL do vídeo:</p>
+                        <input type="text" id="thermalVideoUrl" placeholder="https://example.com/thermal.mp4" class="w-full px-4 py-2 border rounded-lg mt-1">
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button id="cancelConfigureVideos" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                <button id="saveConfiguredVideos" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Map Image Modal -->
+    <div id="changeMapImageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-lg w-full max-w-md">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold">Alterar Imagem do Mapa</h3>
+            </div>
+            <div class="p-4">
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Selecione uma nova imagem para o mapa:</p>
+                    <input type="file" accept="image/*" id="mapImageFileInput" class="w-full">
+                    <div class="upload-status" id="mapImageStatus"></div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Ou insira a URL de uma imagem:</p>
+                    <input type="text" id="mapImageUrlInput" placeholder="https://example.com/map.jpg" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button id="cancelChangeMapImage" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                <button id="saveMapImage" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let currentUser = {
+            username: 'admin',
+            role: 'master'
+        };
+
+        let users = [
+            { id: 1, username: 'admin', role: 'master', password: 'admin' },
+            { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' },
+            { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }
+        ];
+
+        let drones = [
+            { 
+                id: 1, 
+                name: "Drone Gerencial", 
+                icon: "fas fa-cogs", 
+                iconColor: "text-gray-700",
+                battery: "98%",
+                autonomy: "2h",
+                status: "online",
+                position: { left: "40%", top: "32%" }
+            },
+            { 
+                id: 2, 
+                name: "RFLP-03", 
+                icon: "fa-fire-extinguisher", 
+                iconColor: "text-green-500",
+                battery: "100%",
+                autonomy: "1h",
+                status: "online",
+                capacity: "75L/100L",
+                position: { left: "40%", top: "40%" }
+            },
+            { 
+                id: 3, 
+                name: "VTNT-01", 
+                icon: "fa-truck", 
+                iconColor: "text-blue-500",
+                battery: "100%",
+                autonomy: "2h",
+                status: "online",
+                capacity: "950L/1000L",
+                position: { left: "20%", top: "20%" }
+            },
+            { 
+                id: 4, 
+                name: "VTNT-02", 
+                icon: "fa-truck", 
+                iconColor: "text-blue-500",
+                battery: "85%",
+                autonomy: "1:30h",
+                status: "online",
+                capacity: "830L/1000L",
+                position: { left: "20%", top: "20%" }
+            },
+            { 
+                id: 5, 
+                name: "RFLP-01", 
+                icon: "fa-fire-extinguisher", 
+                iconColor: "text-green-500",
+                battery: "100%",
+                autonomy: "1h",
+                status: "stand-by",
+                capacity: "100L/100L",
+                position: { left: "40%", top: "40%" }
+            },
+            { 
+                id: 6, 
+                name: "RFLP-02", 
+                icon: "fa-fire-extinguisher", 
+                iconColor: "text-green-500",
+                battery: "100%",
+                autonomy: "1h",
+                status: "stand-by",
+                capacity: "100L/100L",
+                position: { left: "40%", top: "40%" }
+            },
+            { 
+                id: 7, 
+                name: "VTNT-03", 
+                icon: "fa-truck", 
+                iconColor: "text-blue-500",
+                battery: "100%",
+                autonomy: "1:30h",
+                status: "stand-by",
+                capacity: "1000L/1000L",
+                position: { left: "20%", top: "20%" }
+            }
+
+        ];
+
+        let realTimeMapImage = "https://www.google.com/maps/place/Bebedouro+-+SP/@-20.9093518,-48.4167957,2357m/data=!3m1!1e3!4m6!3m5!1s0x94bbe3ff3103bc1f:0x8eb5b8084c6185b5!8m2!3d-20.9318346!4d-48.4942802!16zL20vMDN5c3Ew!5m1!1e8?entry=ttu&g_ep=EgoyMDI1MDYwNC4wIKXMDSoASAFQAw%3D%3D";
+        let riskAreaMapImage = "https://www.google.com/maps/place/Bebedouro+-+SP/@-20.9093518,-48.4167957,2357m/data=!3m1!1e3!4m6!3m5!1s0x94bbe3ff3103bc1f:0x8eb5b8084c6185b5!8m2!3d-20.9318346!4d-48.4942802!16zL20vMDN5c3Ew!5m1!1e8?entry=ttu&g_ep=EgoyMDI1MDYwNC4wIKXMDSoASAFQAw%3D%3D";
+
+        let historyEvents = {
+            '15/10/2023': {
+                events: [
+                    { 
+                        type: "safe",
+                        image: "",
+                        report: "Dia sem incidentes. Todos os sistemas operando normalmente." 
+                    },
+                    { 
+                        type: "safe",
+                        image: "",
+                        report: "Manutenção preventiva realizada na frota de drones." 
+                    }
+                ]
+            },
+            '12/10/2023': {
+                events: [
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor A2",
+                        responseTime: "8 minutos",
+                        dronesInvolved: "RFLP-02, VTNT-05",
+                        resourcesUsed: "75l RFLP, 250l Água"
+                    },
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor B1",
+                        responseTime: "12 minutos",
+                        dronesInvolved: "RFLP-03, VTNT-06",
+                        resourcesUsed: "60l RFLP, 450l Água"
+                    }
+                ]
+            }
+        };
+
+        let selectedHistoryDate = null;
+        let towerVideos = {
+            normalVideo: "",
+            thermalVideo: ""
+        };
+
+        // Server-side simulation for image upload
+        function simulateServerUpload(file, callback) {
+            // This is a simulation - in a real app, you would send the file to your server
+            setTimeout(() => {
+                // Simulate a random chance of failure (20%)
+                const success = Math.random() > 0.2;
+                
+                if (success) {
+                    // In a real app, the server would return the path to the saved file
+                    const fileName = `image_${Date.now()}_${file.name}`;
+                    const filePath = `C:\\site\\imagem\\${fileName}`;
+                    callback(true, filePath);
+                } else {
+                    callback(false, "Erro no upload. Tente novamente.");
+                }
+            }, 1500);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const loginScreen = document.getElementById('loginScreen');
+            const mainApp = document.getElementById('mainApp');
+            const loginForm = document.getElementById('loginForm');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const views = document.querySelectorAll('[data-view]');
+            const contentSections = document.querySelectorAll('.flex-1 > div');
+            const currentUsernameDisplay = document.getElementById('currentUsername');
+            const adminPanelLink = document.getElementById('adminPanelLink');
+            const changeRiskAreaImageBtn = document.getElementById('changeRiskAreaImage');
+            const configureDronesBtn = document.getElementById('configureDronesBtn');
+            const changeRealTimeMapImageBtn = document.getElementById('changeRealTimeMapImage');
+            const configureVideosBtn = document.getElementById('configureVideosBtn');
+            const configureHistoryImagesBtn = document.getElementById('configureHistoryImagesBtn');
+
+            // Initialize maps
+            document.getElementById('riskAreaMap').style.backgroundImage = `url(${riskAreaMapImage})`;
+            document.getElementById('riskAreaMap').style.backgroundSize = 'cover';
+            document.getElementById('riskAreaMap').style.backgroundPosition = 'center';
+            document.getElementById('riskAreaMap').style.backgroundRepeat = 'no-repeat';
+            
+            document.getElementById('realTimeMap').style.backgroundImage = `url(${realTimeMapImage})`;
+            document.getElementById('realTimeMap').style.backgroundSize = 'cover';
+            document.getElementById('realTimeMap').style.backgroundPosition = 'center';
+            document.getElementById('realTimeMap').style.backgroundRepeat = 'no-repeat';
+
+
+            // Login functionality
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Find user in the users array
+                const user = users.find(u => u.username === username && u.password === password);
+                
+                if(user) {
+                    currentUser = user;
+                    loginScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    currentUsernameDisplay.textContent = user.username;
+                    
+                    // Show admin panel link if user is admin or master
+                    if(user.role === 'master' || user.role === 'admin') {
+                        adminPanelLink.classList.remove('hidden');
+                        changeRiskAreaImageBtn.classList.remove('hidden');
+                        configureDronesBtn.classList.remove('hidden');
+                        changeRealTimeMapImageBtn.classList.remove('hidden');
+                        configureVideosBtn.classList.remove('hidden');
+                        configureHistoryImagesBtn.classList.remove('hidden');
+                    } else {
+                        adminPanelLink.classList.add('hidden');
+                        changeRiskAreaImageBtn.classList.add('hidden');
+                        configureDronesBtn.classList.add('hidden');
+                        changeRealTimeMapImageBtn.classList.add('hidden');
+                        configureVideosBtn.classList.add('hidden');
+                        configureHistoryImagesBtn.classList.add('hidden');
+                    }
+
+                    // Show dashboard by default
+                    showView('dashboard');
+                } else {
+                    alert('Credenciais inválidas. Use admin/admin para entrar.');
+                }
+            });
+
+            // Logout functionality
+            logoutBtn.addEventListener('click', function() {
+                mainApp.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+                
+                // Reset form
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            });
+
+            // Menu navigation functionality
+            views.forEach(view => {
+                view.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const viewName = this.getAttribute('data-view');
+                    
+                    // Check if user has permission to access admin panel
+                    if (viewName === 'adminPanel' && !(currentUser.role === 'master' || currentUser.role === 'admin')) {
+                        alert('Acesso negado. Somente administradores podem acessar esta área.');
+                        return;
+                    }
+                    
+                    showView(viewName);
+                    
+                    // Update active menu styling
+                    views.forEach(v => v.classList.remove('active-menu'));
+                    this.classList.add('active-menu');
+                });
+            });
+
+            // Function to show specific view
+            function showView(viewName) {
+                // Hide all content sections
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                                
+                // Show the selected view
+                document.getElementById(viewName).classList.remove('hidden');
+                                
+                // Render appropriate data for each view
+                switch(viewName) {
+                    case 'dashboard':
+                        // Map is already initialized
+                        break;
+                    case 'realTime':
+                        renderDronesList();
+                        renderDroneMarkers();
+                        break;
+                    case 'history':
+                        renderHistoryDates();
+                        break;
+                    case 'adminPanel':
+                        if (currentUser.role === 'master' || currentUser.role === 'admin') {
+                            renderUsersTable();
+                        } else {
+                            alert('Acesso negado. Somente administradores podem acessar esta área.');
+                            showView('dashboard');
+                        }
+                        break;
+                    case 'towerCamera':
+                        renderTowerVideos();
+                        break;
+                }
+            }
+
+            // Risk area image change functionality
+            changeRiskAreaImageBtn.addEventListener('click', function() {
+                document.getElementById('changeMapImageModal').classList.remove('hidden');
+                document.getElementById('mapImageFileInput').onchange = function(e) {
+                    if(e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const statusElement = document.getElementById('mapImageStatus');
+                        
+                        statusElement.textContent = "Enviando imagem...";
+                        statusElement.className = "upload-status";
+                        statusElement.style.display = "block";
+                        
+                        simulateServerUpload(file, function(success, result) {
+                            if (success) {
+                                statusElement.textContent = "Imagem enviada com sucesso! Salve para confirmar.";
+                                statusElement.className = "upload-status success";
+                                riskAreaMapImage = result;
+                                document.getElementById('mapImageUrlInput').value = '';
+                            } else {
+                                statusElement.textContent = result;
+                                statusElement.className = "upload-status error";
+                            }
+                        });
+                    }
+                };
+            });
+
+            // Real-time map image change functionality
+            changeRealTimeMapImageBtn.addEventListener('click', function() {
+                document.getElementById('changeMapImageModal').classList.remove('hidden');
+                document.getElementById('mapImageFileInput').onchange = function(e) {
+                    if(e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const statusElement = document.getElementById('mapImageStatus');
+                        
+                        statusElement.textContent = "Enviando imagem...";
+                        statusElement.className = "upload-status";
+                        statusElement.style.display = "block";
+                        
+                        simulateServerUpload(file, function(success, result) {
+                            if (success) {
+                                statusElement.textContent = "Imagem enviada com sucesso! Salve para confirmar.";
+                                statusElement.className = "upload-status success";
+                                realTimeMapImage = result;
+                                document.getElementById('mapImageUrlInput').value = '';
+                            } else {
+                                statusElement.textContent = result;
+                                statusElement.className = "upload-status error";
+                            }
+                        });
+                    }
+                };
+            });
+
+            // Save map image functionality
+            document.getElementById('saveMapImage').addEventListener('click', function() {
+                const urlInput = document.getElementById('mapImageUrlInput').value.trim();
+                
+                if(urlInput) {
+                    if(changeRiskAreaImageBtn.classList.contains('hidden') === false) {
+                        riskAreaMapImage = urlInput;
+                    } else {
+                        realTimeMapImage = urlInput;
+                    }
+                }
+                
+                updateMapImages();
+                document.getElementById('changeMapImageModal').classList.add('hidden');
+                document.getElementById('mapImageFileInput').value = '';
+                document.getElementById('mapImageUrlInput').value = '';
+                document.getElementById('mapImageStatus').style.display = "none";
+            });
+
+            // Cancel map image change
+            document.getElementById('cancelChangeMapImage').addEventListener('click', function() {
+                document.getElementById('changeMapImageModal').classList.add('hidden');
+                document.getElementById('mapImageFileInput').value = '';
+                document.getElementById('mapImageUrlInput').value = '';
+                document.getElementById('mapImageStatus').style.display = "none";
+            });
+
+            function updateMapImages() {
+                const riskAreaMap = document.getElementById('riskAreaMap');
+                if(riskAreaMap) {
+                    riskAreaMap.style.backgroundImage = `url(${riskAreaMapImage})`;
+                }
+                
+                const realTimeMap = document.getElementById('realTimeMap');
+                if(realTimeMap) {
+                    realTimeMap.style.backgroundImage = `url(${realTimeMapImage})`;
+                }
+            }
+
+            // Configure drones functionality
+            configureDronesBtn.addEventListener('click', function() {
+                openConfigureDronesModal();
+            });
+
+            // Add new drone button
+            document.getElementById('addNewDroneBtn').addEventListener('click', function() {
+                const newDroneId = drones.length > 0 ? Math.max(...drones.map(d => d.id)) + 1 : 1;
+                drones.push({
+                    id: newDroneId,
+                    name: `Drone ${newDroneId}`,
+                    icon: "fa-drone",
+                    iconColor: "text-gray-700",
+                    battery: "100%",
+                    autonomy: "1h",
+                    status: "online",
+                    position: { left: "50%", top: "50%" }
+                });
+                renderConfiguredDrones();
+            });
+
+            // Save configured drones
+            document.getElementById('saveConfiguredDrones').addEventListener('click', function() {
+                const droneElements = document.querySelectorAll('.configured-drone');
+                
+                droneElements.forEach(el => {
+                    const id = parseInt(el.dataset.droneId);
+                    const drone = drones.find(d => d.id === id);
+                    
+                    if(drone) {
+                        drone.name = el.querySelector('.drone-name-input').value;
+                        drone.icon = el.querySelector('.drone-icon-select').value;
+                        drone.iconColor = el.querySelector('.drone-icon-color-select').value;
+                        drone.position = {
+                            left: el.querySelector('.drone-position-x').value + '%',
+                            top: el.querySelector('.drone-position-y').value + '%'
+                        };
+                    }
+                });
+                
+                document.getElementById('configureDronesModal').classList.add('hidden');
+                renderDronesList();
+                renderDroneMarkers();
+            });
+
+            // Cancel configure drones
+            document.getElementById('cancelConfigureDrones').addEventListener('click', function() {
+                document.getElementById('configureDronesModal').classList.add('hidden');
+            });
+
+            function openConfigureDronesModal() {
+                renderConfiguredDrones();
+                document.getElementById('configureDronesModal').classList.remove('hidden');
+            }
+
+            function renderConfiguredDrones() {
+                const container = document.getElementById('configuredDronesContainer');
+                container.innerHTML = '';
+                
+                drones.forEach(drone => {
+                    const droneEl = document.createElement('div');
+                    droneEl.className = 'configured-drone bg-gray-50 p-4 rounded-lg';
+                    droneEl.dataset.droneId = drone.id;
+                    
+                    const positionX = parseInt(drone.position.left);
+                    const positionY = parseInt(drone.position.top);
+                    
+                    droneEl.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-medium">Drone #${drone.id}</h4>
+                            <button class="text-danger hover:text-red-700" data-drone-delete="${drone.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm mb-1">Nome</label>
+                                <input type="text" class="drone-name-input w-full px-3 py-2 border rounded-lg" value="${drone.name}">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm mb-1">Ícone</label>
+                                <select class="drone-icon-select w-full px-3 py-2 border rounded-lg">
+                                    <option value="fa-drone" ${drone.icon === 'fa-drone' ? 'selected' : ''}>Drone</option>
+                                    <option value="fa-fire-extinguisher" ${drone.icon === 'fa-fire-extinguisher' ? 'selected' : ''}>Extintor</option>
+                                    <option value="fa-truck" ${drone.icon === 'fa-truck' ? 'selected' : ''}>Caminhão</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm mb-1">Cor do Ícone</label>
+                                <select class="drone-icon-color-select w-full px-3 py-2 border rounded-lg">
+                                    <option value="text-gray-700" ${drone.iconColor === 'text-gray-700' ? 'selected' : ''}>Cinza</option>
+                                    <option value="text-red-500" ${drone.iconColor === 'text-red-500' ? 'selected' : ''}>Vermelho</option>
+                                    <option value="text-green-500" ${drone.iconColor === 'text-green-500' ? 'selected' : ''}>Verde</option>
+                                    <option value="text-blue-500" ${drone.iconColor === 'text-blue-500' ? 'selected' : ''}>Azul</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm mb-1">Posição X: <span class="drone-position-x-value">${positionX}</span>%</label>
+                                <input type="range" min="0" max="100" value="${positionX}" class="drone-position-x w-full">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm mb-1">Posição Y: <span class="drone-position-y-value">${positionY}</span>%</label>
+                                <input type="range" min="0" max="100" value="${positionY}" class="drone-position-y w-full">
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(droneEl);
+                    
+                    // Add event listeners for position sliders
+                    droneEl.querySelector('.drone-position-x').addEventListener('input', function() {
+                        droneEl.querySelector('.drone-position-x-value').textContent = this.value;
+                    });
+                    
+                    droneEl.querySelector('.drone-position-y').addEventListener('input', function() {
+                        droneEl.querySelector('.drone-position-y-value').textContent = this.value;
+                    });
+                    
+                    // Add event listener for delete button
+                    droneEl.querySelector(`[data-drone-delete="${drone.id}"]`).addEventListener('click', function() {
+                        if(confirm(`Tem certeza que deseja remover o drone "${drone.name}"?`)) {
+                            drones = drones.filter(d => d.id !== drone.id);
+                            renderConfiguredDrones();
+                        }
+                    });
+                });
+            }
+
+            function renderDronesList() {
+                const container = document.getElementById('droneListContainer');
+                container.innerHTML = '';
+                
+                drones.forEach(drone => {
+                    const droneEl = document.createElement('div');
+                    droneEl.className = 'drone-card bg-white rounded-xl shadow p-4 border border-green-200 transition-all duration-300';
+                    
+                    droneEl.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="mr-4">
+                                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
+                                    <i class="fas ${drone.icon} text-xl ${drone.iconColor}"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-semibold">${drone.id}) ${drone.name}</h3>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                                        <i class="fas fa-circle text-green-500 text-[8px]"></i> Online
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 mt-2 gap-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-battery-full text-green-500 mr-1"></i>
+                                        <span class="text-sm">Bateria: <span class="font-semibold">${drone.battery}</span></span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock text-gray-500 mr-1"></i>
+                                        <span class="text-sm">Tempo restante: <span class="font-semibold">${drone.autonomy}</span></span>
+                                    </div>
+                                </div>
+                                ${drone.capacity ? `
+                                <div class="mt-2">
+                                    <div class="flex items-center">
+                                        <i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} text-gray-500 mr-1"></i>
+                                        <span class="text-sm">Carga: <span class="font-semibold">${drone.capacity}</span></span>
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(droneEl);
+                });
+            }
+
+            function renderDroneMarkers() {
+                const mapContainer = document.getElementById('realTimeMap');
+                // Clear existing markers
+                document.querySelectorAll('.drone-marker').forEach(el => el.remove());
+                
+                drones.forEach(drone => {
+                    const marker = document.createElement('div');
+                    marker.className = 'drone-marker absolute z-10';
+                    marker.style.left = drone.position.left;
+                    marker.style.top = drone.position.top;
+                    
+                    marker.innerHTML = `
+                        <div class="w-8 h-8 rounded-full ${drone.iconColor === 'text-red-500' ? 'bg-red-500' : 
+                                                               drone.iconColor === 'text-green-500' ? 'bg-green-500' : 
+                                                               drone.iconColor === 'text-blue-500' ? 'bg-blue-500' : 'bg-gray-500'} 
+                               border-2 border-white shadow-lg flex items-center justify-center">
+                            <i class="fas ${drone.icon} text-white text-xs"></i>
+                        </div>
+                        <div class="mt-1 bg-white p-2 rounded-lg shadow text-xs max-w-[150px]">
+                            <div class="font-semibold">${drone.name}</div>
+                            <div class="flex items-center">
+                                <i class="fas fa-battery-full text-green-500 mr-1"></i>
+                                <span>${drone.battery}</span>
+                            </div>
+                            ${drone.capacity ? `
+                            <div class="flex items-center">
+                                <i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} ${drone.iconColor} mr-1"></i>
+                                <span>${drone.capacity}</span>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    
+                    mapContainer.appendChild(marker);
+                });
+            }
+
+            // Tower videos configuration
+            configureVideosBtn.addEventListener('click', function() {
+                document.getElementById('configureVideosModal').classList.remove('hidden');
+                document.getElementById('normalVideoInput').value = '';
+                document.getElementById('thermalVideoInput').value = '';
+                document.getElementById('normalVideoUrl').value = towerVideos.normalVideo;
+                document.getElementById('thermalVideoUrl').value = towerVideos.thermalVideo;
+            });
+
+            // Handle video uploads
+            document.getElementById('normalVideoInput').addEventListener('change', function(e) {
+                if(e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const statusElement = document.getElementById('normalVideoStatus');
+                    
+                    statusElement.textContent = "Enviando vídeo...";
+                    statusElement.className = "upload-status";
+                    statusElement.style.display = "block";
+                    
+                    simulateServerUpload(file, function(success, result) {
+                        if (success) {
+                            statusElement.textContent = "Vídeo enviado com sucesso! Salve para confirmar.";
+                            statusElement.className = "upload-status success";
+                            document.getElementById('normalVideoUrl').value = result;
+                        } else {
+                            statusElement.textContent = result;
+                            statusElement.className = "upload-status error";
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('thermalVideoInput').addEventListener('change', function(e) {
+                if(e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const statusElement = document.getElementById('thermalVideoStatus');
+                    
+                    statusElement.textContent = "Enviando vídeo...";
+                    statusElement.className = "upload-status";
+                    statusElement.style.display = "block";
+                    
+                    simulateServerUpload(file, function(success, result) {
+                        if (success) {
+                            statusElement.textContent = "Vídeo enviado com sucesso! Salve para confirmar.";
+                            statusElement.className = "upload-status success";
+                            document.getElementById('thermalVideoUrl').value = result;
+                        } else {
+                            statusElement.textContent = result;
+                            statusElement.className = "upload-status error";
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('saveConfiguredVideos').addEventListener('click', function() {
+                const normalVideoUrl = document.getElementById('normalVideoUrl').value.trim();
+                const thermalVideoUrl = document.getElementById('thermalVideoUrl').value.trim();
+                
+                if(normalVideoUrl) {
+                    towerVideos.normalVideo = normalVideoUrl;
+                }
+                
+                if(thermalVideoUrl) {
+                    towerVideos.thermalVideo = thermalVideoUrl;
+                }
+                
+                updateTowerVideos();
+                document.getElementById('configureVideosModal').classList.add('hidden');
+                document.getElementById('normalVideoStatus').style.display = "none";
+                document.getElementById('thermalVideoStatus').style.display = "none";
+            });
+
+            document.getElementById('cancelConfigureVideos').addEventListener('click', function() {
+                document.getElementById('configureVideosModal').classList.add('hidden');
+                document.getElementById('normalVideoStatus').style.display = "none";
+                document.getElementById('thermalVideoStatus').style.display = "none";
+            });
+
+            function renderTowerVideos() {
+                updateTowerVideos();
+            }
+
+            function updateTowerVideos() {
+                const normalVideo = document.getElementById('normalVideo');
+                const thermalVideo = document.getElementById('thermalVideo');
+                
+                if(towerVideos.normalVideo) {
+                    normalVideo.querySelector('source').src = towerVideos.normalVideo;
+                    normalVideo.load();
+                }
+                
+                if(towerVideos.thermalVideo) {
+                    thermalVideo.querySelector('source').src = towerVideos.thermalVideo;
+                    thermalVideo.load();
+                }
+            }
+
+            // History events management
+            configureHistoryImagesBtn.addEventListener('click', function() {
+                if(selectedHistoryDate) {
+                    renderHistoryEventDetails(selectedHistoryDate);
+                } else {
+                    alert('Por favor, selecione uma data para configurar.');
+                }
+            });
+
+            function renderHistoryDates() {
+                const container = document.getElementById('historyDatesList');
+                container.innerHTML = '';
+                
+                Object.keys(historyEvents).forEach(date => {
+                    const hasFires = historyEvents[date].events.some(e => e.type === "fire");
+                    
+                    const dateEl = document.createElement('div');
+                    dateEl.className = `p-3 ${hasFires ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'} border rounded-lg cursor-pointer hover:${hasFires ? 'bg-red-100' : 'bg-green-100'}`;
+                    dateEl.textContent = date;
+                    dateEl.addEventListener('click', function() {
+                        selectedHistoryDate = date;
+                        document.querySelectorAll('#historyDatesList > div').forEach(el => {
+                            el.classList.remove('ring-2', 'ring-primary');
+                        });
+                        dateEl.classList.add('ring-2', 'ring-primary');
+                        
+                        renderHistoryEventDetails(date);
+                    });
+                    
+                    container.appendChild(dateEl);
+                });
+            }
+
+            function renderHistoryEventDetails(date) {
+                const events = historyEvents[date].events;
+                document.getElementById('historyDateTitle').textContent = `Detalhes do Evento: ${date}`;
+                document.getElementById('noHistorySelected').classList.add('hidden');
+                document.getElementById('historyEventsContainer').classList.remove('hidden');
+                
+                // Configure first event
+                const event1 = events[0];
+                const image1Container = document.getElementById('historyImage1Container');
+                const image1Input = document.getElementById('historyImage1Input');
+                const event1TypeSelect = document.getElementById('historyEvent1Type');
+                const event1Details = document.getElementById('historyEvent1Details');
+                
+                // Clear existing content
+                image1Container.innerHTML = '';
+                
+                // Show existing image if available
+                if(event1.image) {
+                    const img = document.createElement('img');
+                    img.src = event1.image;
+                    img.className = 'w-full h-full object-cover';
+                    image1Container.appendChild(img);
+                } else {
+                    const uploadContainer = image1Container.querySelector('.image-upload-container');
+                    uploadContainer.classList.remove('hidden');
+                    image1Container.appendChild(uploadContainer);
+                }
+                
+                // Set event type
+                event1TypeSelect.value = event1.type;
+                event1TypeSelect.classList.remove('hidden');
+                
+                // Show event details based on type
+                if(event1.type === 'fire') {
+                    event1Details.innerHTML = `
+                        <p class="font-medium mb-1">Incêndio Reportado</p>
+                        <p><strong>Localização:</strong> ${event1.location}</p>
+                        <p><strong>Tempo de resposta:</strong> ${event1.responseTime}</p>
+                        <p><strong>Drones envolvidos:</strong> ${event1.dronesInvolved}</p>
+                        <p><strong>Recursos usados:</strong> ${event1.resourcesUsed}</p>
+                    `;
+                } else {
+                    event1Details.innerHTML = `
+                        <p class="font-medium mb-1">Sem incidentes</p>
+                        <p>${event1.report}</p>
+                    `;
+                }
+                event1Details.classList.remove('hidden');
+                
+                // Configure second event if exists
+                if(events.length > 1) {
+                    const event2 = events[1];
+                    const image2Container = document.getElementById('historyImage2Container');
+                    const image2Input = document.getElementById('historyImage2Input');
+                    const event2TypeSelect = document.getElementById('historyEvent2Type');
+                    const event2Details = document.getElementById('historyEvent2Details');
+                    
+                    // Clear existing content
+                    image2Container.innerHTML = '';
+                    
+                    // Show existing image if available
+                    if(event2.image) {
+                        const img = document.createElement('img');
+                        img.src = event2.image;
+                        img.className = 'w-full h-full object-cover';
+                        image2Container.appendChild(img);
+                    } else {
+                        const uploadContainer = image2Container.querySelector('.image-upload-container');
+                        uploadContainer.classList.remove('hidden');
+                        image2Container.appendChild(uploadContainer);
+                    }
+                    
+                    // Set event type
+                    event2TypeSelect.value = event2.type;
+                    event2TypeSelect.classList.remove('hidden');
+                    
+                    // Show event details based on type
+                    if(event2.type === 'fire') {
+                        event2Details.innerHTML = `
+                            <p class="font-medium mb-1">Incêndio Reportado</p>
+                            <p><strong>Localização:</strong> ${event2.location}</p>
+                            <p><strong>Tempo de resposta:</strong> ${event2.responseTime}</p>
+                            <p><strong>Drones envolvidos:</strong> ${event2.dronesInvolved}</p>
+                            <p><strong>Recursos usados:</strong> ${event2.resourcesUsed}</p>
+                        `;
+                    } else {
+                        event2Details.innerHTML = `
+                            <p class="font-medium mb-1">Sem incidentes</p>
+                            <p>${event2.report}</p>
+                        `;
+                    }
+                    event2Details.classList.remove('hidden');
+                }
+                
+                // Update summary
+                const fireCount = events.filter(e => e.type === 'fire').length;
+                if(fireCount > 0) {
+                    document.getElementById('historySummarySection').classList.remove('hidden');
+                    document.getElementById('historySummaryText').textContent = 
+                        `Total de incidentes: ${fireCount} | Água usada: 700l | RFLP usado: 135l`;
+                } else {
+                    document.getElementById('historySummarySection').classList.add('hidden');
+                }
+                
+                // Add event listeners for image uploads
+                setupHistoryImageUploads(date);
+            }
+
+            function setupHistoryImageUploads(date) {
+                const image1Input = document.getElementById('historyImage1Input');
+                const image2Input = document.getElementById('historyImage2Input');
+                const status1Element = document.getElementById('historyImage1Status');
+                const status2Element = document.getElementById('historyImage2Status');
+                
+                image1Input.addEventListener('change', function(e) {
+                    if(e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        
+                        status1Element.textContent = "Enviando imagem...";
+                        status1Element.className = "upload-status";
+                        status1Element.style.display = "block";
+                        
+                        simulateServerUpload(file, function(success, result) {
+                            if (success) {
+                                status1Element.textContent = "Imagem enviada com sucesso!";
+                                status1Element.className = "upload-status success";
+                                
+                                historyEvents[date].events[0].image = result;
+                                
+                                const container = document.getElementById('historyImage1Container');
+                                container.innerHTML = '';
+                                
+                                const img = document.createElement('img');
+                                img.src = result;
+                                img.className = 'w-full h-full object-cover';
+                                container.appendChild(img);
+                            } else {
+                                status1Element.textContent = result;
+                                status1Element.className = "upload-status error";
+                            }
+                        });
+                    }
+                });
+                
+                if(historyEvents[date].events.length > 1) {
+                    image2Input.addEventListener('change', function(e) {
+                        if(e.target.files.length > 0) {
+                            const file = e.target.files[0];
+                            
+                            status2Element.textContent = "Enviando imagem...";
+                            status2Element.className = "upload-status";
+                            status2Element.style.display = "block";
+                            
+                            simulateServerUpload(file, function(success, result) {
+                                if (success) {
+                                    status2Element.textContent = "Imagem enviada com sucesso!";
+                                    status2Element.className = "upload-status success";
+                                    
+                                    historyEvents[date].events[1].image = result;
+                                    
+                                    const container = document.getElementById('historyImage2Container');
+                                    container.innerHTML = '';
+                                    
+                                    const img = document.createElement('img');
+                                    img.src = result;
+                                    img.className = 'w-full h-full object-cover';
+                                    container.appendChild(img);
+                                } else {
+                                    status2Element.textContent = result;
+                                    status2Element.className = "upload-status error";
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            // User management functionality
+            function renderUsersTable() {
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    
+                    let roleClass = '';
+                    let roleText = '';
+                    
+                    switch(user.role) {
+                        case 'master':
+                            roleClass = 'bg-purple-100 text-purple-800';
+                            roleText = 'Master';
+                            break;
+                        case 'admin':
+                            roleClass = 'bg-blue-100 text-blue-800';
+                            roleText = 'Administrador';
+                            break;
+                        case 'viewer':
+                        default:
+                            roleClass = 'bg-green-100 text-green-800';
+                            roleText = 'Visualização';
+                    }
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                ${user.role === 'master' ? 
+                                 '<i class="fas fa-crown text-yellow-500 mr-2"></i>' : 
+                                 user.role === 'admin' ? 
+                                 '<i class="fas fa-user-shield text-blue-500 mr-2"></i>' : 
+                                 '<i class="fas fa-eye text-green-500 mr-2"></i>'}
+                                <span class="font-medium">${user.username}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 ${roleClass} rounded-full text-xs">${roleText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button onclick="editUser(${user.id})" class="text-secondary hover:text-primary mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${user.role !== 'master' || currentUser.role === 'master' ? `
+                            <button onclick="deleteUser(${user.id})" class="text-danger hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+            
+            // Modal elements
+            const userModal = document.getElementById('userModal');
+            const addUserBtn = document.getElementById('addUserBtn');
+            const cancelModal = document.getElementById('cancelModal');
+            const saveUser = document.getElementById('saveUser');
+            const userForm = document.getElementById('userForm');
+            
+            // Add user modal function
+            addUserBtn.addEventListener('click', function() {
+                document.getElementById('modalTitle').textContent = 'Adicionar Usuário';
+                userForm.reset();
+                document.getElementById('userId').value = '';
+                userModal.classList.remove('hidden');
+            });
+            
+            function closeUserModal() {
+                userModal.classList.add('hidden');
+            }
+            
+            function saveNewUser() {
+                const id = document.getElementById('userId').value;
+                const username = document.getElementById('usernameInput').value.trim();
+                const password = document.getElementById('passwordInput').value.trim();
+                const role = document.getElementById('roleInput').value;
+                
+                if(!username || !password || !role) {
+                    alert('Por favor, preencha todos os campos!');
+                    return;
+                }
+                
+                if(id) {
+                    // Update existing user
+                    const index = users.findIndex(u => u.id == id);
+                    if(index !== -1) {
+                        // Don't allow changing master user role if not master
+                        if (users[index].role === 'master' && currentUser.role !== 'master') {
+                            alert('Apenas usuários master podem modificar outros usuários master.');
+                            return;
+                        }
+                        
+                        users[index] = {
+                            ...users[index],
+                            username,
+                            password,
+                            role
+                        };
+                    }
+                } else {
+                    // Check if username already exists
+                    if(users.some(u => u.username === username)) {
+                        alert('Este nome de usuário já está em uso!');
+                        return;
+                    }
+                    
+                    // Add new user
+                    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+                    users.push({
+                        id: newId,
+                        username,
+                        password,
+                        role
+                    });
+                }
+                
+                closeUserModal();
+                renderUsersTable();
+            }
+            
+            function deleteUser(id) {
+                const user = users.find(u => u.id === id);
+                if (!user) return;
+                
+                // Don't allow deleting master users unless current user is master
+                if (user.role === 'master' && currentUser.role !== 'master') {
+                    alert('Apenas usuários master podem deletar outros usuários master.');
+                    return;
+                }
+                
+                // Don't allow deleting yourself
+                if (user.id === currentUser.id) {
+                    alert('Você não pode deletar seu próprio usuário.');
+                    return;
+                }
+                
+                if(confirm(`Tem certeza que deseja excluir o usuário "${user.username}"?`)) {
+                    users = users.filter(u => u.id !== id);
+                    renderUsersTable();
+                }
+            }
+            
+            function editUser(id) {
+                const user = users.find(u => u.id === id);
+                if(user) {
+                    // Don't allow editing master users unless current user is master
+                    if (user.role === 'master' && currentUser.role !== 'master') {
+                        alert('Apenas usuários master podem editar outros usuários master.');
+                        return;
+                    }
+                    
+                    document.getElementById('modalTitle').textContent = 'Editar Usuário';
+                    document.getElementById('userId').value = user.id;
+                    document.getElementById('usernameInput').value = user.username;
+                    document.getElementById('passwordInput').value = user.password;
+                    
+                    const roleInput = document.getElementById('roleInput');
+                    roleInput.value = user.role;
+                    
+                    // Disable role change for master users unless current user is master
+                    if (user.role === 'master' && currentUser.role !== 'master') {
+                        roleInput.disabled = true;
+                    } else {
+                        roleInput.disabled = false;
+                    }
+                    
+                    userModal.classList.remove('hidden');
+                }
+            }
+            
+            // Event Listeners
+            cancelModal.addEventListener('click', closeUserModal);
+            saveUser.addEventListener('click', saveNewUser);
+            
+            // Expose functions to global scope for HTML onclick handlers
+            window.deleteUser = deleteUser;
+            window.editUser = editUser;
+            window.addUser = function() {
+                document.getElementById('modalTitle').textContent = 'Adicionar Usuário';
+                userForm.reset();
+                document.getElementById('userId').value = '';
+                userModal.classList.remove('hidden');
+            };
+        });
+    </script>
+</body>
+</html>
