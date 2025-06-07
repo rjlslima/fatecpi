@@ -33,14 +33,6 @@
             position: relative;
             height: 100%;
         }
-        .map-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-        }
         .temperature {
             background: linear-gradient(45deg, #c70039, #ff5733, #ffc300);
             animation: heat-pulse 2s infinite alternate;
@@ -88,6 +80,22 @@
             width: 100%;
             height: 100%;
             border: none;
+            pointer-events: none;
+        }
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .map-controls button {
+            background-color: white;
+            border: none;
+            border-radius: 2px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            cursor: pointer;
+            margin-bottom: 5px;
+            padding: 5px 10px;
         }
     </style>
 </head>
@@ -337,7 +345,6 @@
                                         loading="lazy" 
                                         referrerpolicy="no-referrer-when-downgrade">
                                     </iframe>
-                                    <div class="map-overlay"></div>
                                     <div class="relative p-4 h-full">
                                         <div class="temperature absolute top-4 right-4 p-3 bg-black/70 text-white rounded-lg">
                                             <span class="font-bold">38°C</span> Temperatura
@@ -382,22 +389,12 @@
                                     loading="lazy" 
                                     referrerpolicy="no-referrer-when-downgrade">
                                 </iframe>
-                                <div class="map-overlay"></div>
+                                <div class="map-controls">
+                                    <button id="recenterMap" class="bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded shadow">
+                                        <i class="fas fa-crosshairs"></i> Recentralizar
+                                    </button>
+                                </div>
                                 <div class="relative h-full p-4">
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <div class="flex space-x-2">
-                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <button class="bg-white/90 hover:bg-white text-gray-800 font-bold p-2 rounded-lg shadow">
-                                                <i class="fas fa-compress-alt"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                                                        
                                     <div class="temperature absolute top-16 right-4 p-3 bg-black/70 text-white rounded-lg z-10">
                                         <span class="font-bold">38°C</span> Temperatura Média
                                     </div>
@@ -754,8 +751,11 @@
                 capacity: "1000L/1000L",
                 position: { left: "20%", top: "20%" }
             }
-
         ];
+
+        // Coordenadas fixas para Bebedouro-SP
+        const bebebouroCoords = "-20.9318346,-48.4942802";
+        let mapIframe = null;
 
         let historyEvents = {
             '15/10/2023': {
@@ -770,27 +770,82 @@
                         image: "",
                         report: "Manutenção preventiva realizada na frota de drones." 
                     }
-                ]
+                ],
+                summary: "Dia sem incidentes. Todos os drones passaram por manutenção preventiva."
             },
             '12/10/2023': {
                 events: [
                     { 
                         type: "fire",
                         image: "",
-                        location: "Setor A2",
+                        location: "Setor A2 - Coordenadas: -20.935, -48.492",
                         responseTime: "8 minutos",
                         dronesInvolved: "RFLP-02, VTNT-05",
-                        resourcesUsed: "75l RFLP, 250l Água"
+                        resourcesUsed: "75l RFLP, 250l Água",
+                        duration: "25 minutos"
                     },
                     { 
                         type: "fire",
                         image: "",
-                        location: "Setor B1",
+                        location: "Setor B1 - Coordenadas: -20.928, -48.501",
                         responseTime: "12 minutos",
                         dronesInvolved: "RFLP-03, VTNT-06",
-                        resourcesUsed: "60l RFLP, 450l Água"
+                        resourcesUsed: "60l RFLP, 450l Água",
+                        duration: "35 minutos"
                     }
-                ]
+                ],
+                summary: "2 focos de incêndio detectados. Tempo médio de resposta: 10 minutos. Total de recursos usados: 135l RFLP, 700l Água."
+            },
+            '05/09/2023': {
+                events: [
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor C3 - Coordenadas: -20.933, -48.505",
+                        responseTime: "15 minutos",
+                        dronesInvolved: "RFLP-01, VTNT-03",
+                        resourcesUsed: "90l RFLP, 600l Água",
+                        duration: "45 minutos"
+                    }
+                ],
+                summary: "1 foco de incêndio de média intensidade. Tempo total de combate: 45 minutos. Recursos usados: 90l RFLP, 600l Água."
+            },
+            '22/08/2023': {
+                events: [
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor A1 - Coordenadas: -20.930, -48.490",
+                        responseTime: "6 minutos",
+                        dronesInvolved: "RFLP-02, VTNT-01",
+                        resourcesUsed: "45l RFLP, 300l Água",
+                        duration: "20 minutos"
+                    },
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor D2 - Coordenadas: -20.925, -48.500",
+                        responseTime: "10 minutos",
+                        dronesInvolved: "RFLP-03, VTNT-02",
+                        resourcesUsed: "55l RFLP, 400l Água",
+                        duration: "30 minutos"
+                    }
+                ],
+                summary: "2 focos de incêndio detectados. Tempo médio de resposta: 8 minutos. Total de recursos usados: 100l RFLP, 700l Água."
+            },
+            '10/07/2023': {
+                events: [
+                    { 
+                        type: "fire",
+                        image: "",
+                        location: "Setor B2 - Coordenadas: -20.929, -48.495",
+                        responseTime: "5 minutos",
+                        dronesInvolved: "RFLP-01, VTNT-03",
+                        resourcesUsed: "50l RFLP, 350l Água",
+                        duration: "25 minutos"
+                    }
+                ],
+                summary: "1 foco de incêndio detectado. Resposta rápida em 5 minutos. Recursos usados: 50l RFLP, 350l Água. Tempo total até extinção: 25 minutos."
             }
         };
 
@@ -814,6 +869,28 @@
             const configureDronesBtn = document.getElementById('configureDronesBtn');
             const configureVideosBtn = document.getElementById('configureVideosBtn');
             const configureHistoryImagesBtn = document.getElementById('configureHistoryImagesBtn');
+            const recenterMapBtn = document.getElementById('recenterMap');
+
+            // Initialize map iframe
+            function initializeMap() {
+                mapIframe = document.querySelector('#realTimeMap iframe');
+                if (mapIframe) {
+                    // Fix the location to Bebedouro-SP
+                    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
+                }
+            }
+
+            // Recenter map function
+            function recenterMap() {
+                if (mapIframe) {
+                    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
+                }
+            }
+
+            // Add event listener for recenter button
+            if (recenterMapBtn) {
+                recenterMapBtn.addEventListener('click', recenterMap);
+            }
 
             // Login functionality
             loginForm.addEventListener('submit', function(e) {
@@ -840,10 +917,15 @@
                         configureHistoryImagesBtn.classList.remove('hidden');
                     } else {
                         adminPanelLink.classList.add('hidden');
+                        changeRiskAreaImageBtn.classList.add('hidden');
+                        configureDronesBtn.classList.add('hidden');
+                        configureVideosBtn.classList.add('hidden');
+                        configureHistoryImagesBtn.classList.add('hidden');
                     }
 
                     // Show dashboard by default
                     showView('dashboard');
+                    initializeMap();
                 } else {
                     alert('Credenciais inválidas. Use admin/admin para entrar.');
                 }
@@ -1253,6 +1335,7 @@
                         <p><strong>Tempo de resposta:</strong> ${event1.responseTime}</p>
                         <p><strong>Drones envolvidos:</strong> ${event1.dronesInvolved}</p>
                         <p><strong>Recursos usados:</strong> ${event1.resourcesUsed}</p>
+                        <p><strong>Tempo total até extinção:</strong> ${event1.duration}</p>
                     `;
                 } else {
                     event1Details.innerHTML = `
@@ -1297,6 +1380,7 @@
                             <p><strong>Tempo de resposta:</strong> ${event2.responseTime}</p>
                             <p><strong>Drones envolvidos:</strong> ${event2.dronesInvolved}</p>
                             <p><strong>Recursos usados:</strong> ${event2.resourcesUsed}</p>
+                            <p><strong>Tempo total até extinção:</strong> ${event2.duration}</p>
                         `;
                     } else {
                         event2Details.innerHTML = `
@@ -1311,10 +1395,10 @@
                 const fireCount = events.filter(e => e.type === 'fire').length;
                 if(fireCount > 0) {
                     document.getElementById('historySummarySection').classList.remove('hidden');
-                    document.getElementById('historySummaryText').textContent = 
-                        `Total de incidentes: ${fireCount} | Água usada: 700l | RFLP usado: 135l`;
+                    document.getElementById('historySummaryText').textContent = historyEvents[date].summary;
                 } else {
-                    document.getElementById('historySummarySection').classList.add('hidden');
+                    document.getElementById('historySummarySection').classList.remove('hidden');
+                    document.getElementById('historySummaryText').textContent = historyEvents[date].summary;
                 }
                 
                 // Add event listeners for image uploads
