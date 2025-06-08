@@ -80,7 +80,6 @@
             width: 100%;
             height: 100%;
             border: none;
-            pointer-events: none;
         }
         .map-controls {
             position: absolute;
@@ -96,6 +95,16 @@
             cursor: pointer;
             margin-bottom: 5px;
             padding: 5px 10px;
+        }
+        @keyframes droneMove {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(5px, 5px); }
+            50% { transform: translate(10px, 0); }
+            75% { transform: translate(5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+        .drone-marker {
+            animation: droneMove 8s infinite linear;
         }
     </style>
 </head>
@@ -436,8 +445,8 @@
                         <div class="bg-white rounded-xl shadow p-4">
                             <h2 class="text-lg font-semibold mb-4">Visão Normal</h2>
                             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
-                                <video controls class="w-full h-full object-cover" id="normalVideo">
-                                    <source src="" type="video/mp4">
+                                <video autoplay loop muted class="w-full h-full object-cover" id="normalVideo">
+                                    <source src="video/video1.mp4" type="video/mp4">
                                     Seu navegador não suporta o elemento de vídeo.
                                 </video>
                             </div>
@@ -445,8 +454,8 @@
                         <div class="bg-white rounded-xl shadow p-4">
                             <h2 class="text-lg font-semibold mb-4">Visão Térmica</h2>
                             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
-                                <video controls class="w-full h-full object-cover" id="thermalVideo">
-                                    <source src="" type="video/mp4">
+                                <video autoplay loop muted class="w-full h-full object-cover" id="thermalVideo">
+                                    <source src="video/video2.mp4" type="video/mp4">
                                     Seu navegador não suporta o elemento de vídeo.
                                 </video>
                             </div>
@@ -753,9 +762,10 @@
             }
         ];
 
-        // Coordenadas fixas para Bebedouro-SP
-        const bebebouroCoords = "-20.9318346,-48.4942802";
+        // Fixed coordinates for recentering
+        const fixedCoords = "-20.906886,-48.420668";
         let mapIframe = null;
+        let riskMapIframe = null;
 
         let historyEvents = {
             '15/10/2023': {
@@ -851,8 +861,8 @@
 
         let selectedHistoryDate = null;
         let towerVideos = {
-            normalVideo: "",
-            thermalVideo: ""
+            normalVideo: "video/video1.mp4",
+            thermalVideo: "video/video2.mp4"
         };
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -871,19 +881,28 @@
             const configureHistoryImagesBtn = document.getElementById('configureHistoryImagesBtn');
             const recenterMapBtn = document.getElementById('recenterMap');
 
-            // Initialize map iframe
-            function initializeMap() {
+            // Initialize map iframes
+            function initializeMaps() {
                 mapIframe = document.querySelector('#realTimeMap iframe');
+                riskMapIframe = document.querySelector('#riskAreaMap iframe');
+                
                 if (mapIframe) {
-                    // Fix the location to Bebedouro-SP
+                    // Set the initial location to the fixed coordinates
                     mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
+                }
+                
+                if (riskMapIframe) {
+                    riskMapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
                 }
             }
 
-            // Recenter map function
+            // Recenter map function to fixed coordinates
             function recenterMap() {
                 if (mapIframe) {
-                    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
+                    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d119928.2152882134!2d-48.420668!3d-20.906886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
+                }
+                if (riskMapIframe) {
+                    riskMapIframe.src = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d119928.2152882134!2d-48.420668!3d-20.906886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr`;
                 }
             }
 
@@ -925,7 +944,7 @@
 
                     // Show dashboard by default
                     showView('dashboard');
-                    initializeMap();
+                    initializeMaps();
                 } else {
                     alert('Credenciais inválidas. Use admin/admin para entrar.');
                 }
@@ -1254,11 +1273,13 @@
                 if(towerVideos.normalVideo) {
                     normalVideo.querySelector('source').src = towerVideos.normalVideo;
                     normalVideo.load();
+                    normalVideo.play();
                 }
                 
                 if(towerVideos.thermalVideo) {
                     thermalVideo.querySelector('source').src = towerVideos.thermalVideo;
                     thermalVideo.load();
+                    thermalVideo.play();
                 }
             }
 
