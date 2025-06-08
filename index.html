@@ -446,7 +446,7 @@
                             <h2 class="text-lg font-semibold mb-4">Visão Normal</h2>
                             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
                                 <video autoplay loop muted class="w-full h-full object-cover" id="normalVideo">
-                                    <source src="<iframe width="560" height="315" src="https://youtu.be/4nA94WchxCI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>" type="video/mp4">
+                                    <source src="video/video1.mp4" type="video/mp4">
                                     Seu navegador não suporta o elemento de vídeo.
                                 </video>
                             </div>
@@ -455,7 +455,7 @@
                             <h2 class="text-lg font-semibold mb-4">Visão Térmica</h2>
                             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
                                 <video autoplay loop muted class="w-full h-full object-cover" id="thermalVideo">
-                                   <source src="<iframe width="560" height="315" src="https://youtu.be/tucPhfotu94" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>" type="video/mp4">
+                                    <source src="video/video2.mp4" type="video/mp4">
                                     Seu navegador não suporta o elemento de vídeo.
                                 </video>
                             </div>
@@ -861,8 +861,8 @@
 
         let selectedHistoryDate = null;
         let towerVideos = {
-            normalVideo: "<iframe width="560" height="315" src="https://youtu.be/4nA94WchxCI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>",
-            thermalVideo: "<iframe width="560" height="315" src="https://youtu.be/tucPhfotu94" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>",
+            normalVideo: "video/video1.mp4",
+            thermalVideo: "video/video2.mp4"
         };
 
         document.addEventListener('DOMContentLoaded', function() {
