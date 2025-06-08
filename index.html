@@ -181,16 +181,16 @@
                     </div>
                 </div>
 
-                <div id="realTime" class="hidden">
+                <div id="realTime" class="hidden h-full">
                      <div class="flex flex-col lg:flex-row h-full gap-6">
-                        <div class="w-full lg:w-1/3 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
-                        <div class="w-full lg:w-2/3 relative h-full rounded-xl overflow-hidden shadow-lg"><div class="map-container" id="realTimeMap"><iframe class="google-maps-iframe" src=""></iframe></div></div>
+                        <div class="w-full lg:w-1/4 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
+                        <div class="w-full lg:w-3/4 h-full relative rounded-xl overflow-hidden shadow-lg"><div class="map-container" id="realTimeMap"><iframe class="google-maps-iframe" src=""></iframe></div></div>
                     </div>
                 </div>
                 
                 <div id="towerCamera" class="hidden">
                     <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1><button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition"><i class="fas fa-cog mr-2"></i>Configurar Vídeos</button></div>
-                    <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="max-w-2xl mx-auto space-y-8">
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Normal</h2><div id="normalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Térmica</h2><div id="thermalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                     </div>
@@ -239,17 +239,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- DATA ---
-            let currentUser = { username: 'admin', role: 'master' };
             let users = [ { id: 1, username: 'admin', role: 'master', password: 'admin' }, { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' }, { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }];
             let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "RFLP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "RFLP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "RFLP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
             let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "RFLP-02, VTNT-05", resourcesUsed: "75l RFLP, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "RFLP-01, VTNT-03", resourcesUsed: "90l RFLP, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             let towerVideos = { normalVideo: "", thermalVideo: "" };
-            const fixedCoords = "-20.906886,-48.420668";
+            const fixedCoords = "-20.839381,-48.328954";
 
             // --- DOM Elements ---
             const mainApp = document.getElementById('mainApp');
             const contentSections = document.querySelectorAll('.flex-1 > div[id]');
-            // Modals
             const configureVideosModal = document.getElementById('configureVideosModal');
             const historyModal = document.getElementById('historyModal');
             const userModal = document.getElementById('userModal');
@@ -260,15 +258,9 @@
                 const activeSection = document.getElementById(viewName);
                 if (activeSection) {
                     activeSection.classList.remove('hidden');
-                    // Call render functions based on the view
-                    if(viewName === 'realTime') {
-                        renderDronesList();
-                        renderDroneMarkers();
-                    } else if (viewName === 'adminPanel') {
-                        renderUsersTable();
-                    } else if (viewName === 'history') {
-                        renderHistoryDates();
-                    }
+                    if(viewName === 'realTime') { renderDronesList(); renderDroneMarkers(); } 
+                    else if (viewName === 'adminPanel') { renderUsersTable(); } 
+                    else if (viewName === 'history') { renderHistoryDates(); }
                 }
             }
 
@@ -287,16 +279,13 @@
                 e.preventDefault();
                 const user = users.find(u => u.username === document.getElementById('username').value && u.password === document.getElementById('password').value);
                 if (user) {
-                    currentUser = user;
                     document.getElementById('currentUsername').textContent = user.username;
                     document.getElementById('adminPanelLink').classList.toggle('hidden', user.role !== 'master' && user.role !== 'admin');
                     document.getElementById('loginScreen').classList.add('hidden');
                     mainApp.classList.remove('hidden');
                     initializeMaps();
                     showView('dashboard');
-                } else {
-                    alert('Credenciais inválidas.');
-                }
+                } else { alert('Credenciais inválidas.'); }
             });
 
             document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -316,25 +305,12 @@
             function renderDronesList() {
                 const container = document.getElementById('droneListContainer');
                 container.innerHTML = drones.map(drone => `
-                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div class="flex items-start">
-                            <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start"><h3 class="font-semibold">${drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span></div>
-                                <div class="grid grid-cols-2 mt-2 gap-2 text-sm">
-                                    <div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
-                                    <div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
-                                    ${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200"><div class="flex items-start"><div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i></div><div class="flex-1"><div class="flex justify-between items-start"><h3 class="font-semibold">${drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span></div><div class="grid grid-cols-2 mt-2 gap-2 text-sm"><div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div><div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}</div></div></div></div>`
+                ).join('');
             }
 
             function renderDroneMarkers() {
                 const mapContainer = document.getElementById('realTimeMap');
-                // Clear old markers first
                 mapContainer.querySelectorAll('.drone-marker').forEach(el => el.remove());
                 drones.forEach(drone => {
                     const marker = document.createElement('div');
@@ -351,17 +327,10 @@
                 if (!url) return "";
                 let videoId = '';
                 try {
-                    if (url.includes("youtu.be/")) {
-                        videoId = url.split('youtu.be/')[1].split('?')[0];
-                    } else if (url.includes("youtube.com/watch")) {
-                        const urlParams = new URLSearchParams(new URL(url).search);
-                        videoId = urlParams.get('v');
-                    }
-                } catch (e) { console.error("Invalid YouTube URL"); return ""; }
-                
-                if (videoId) {
-                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
-                }
+                    if (url.includes("youtu.be/")) { videoId = url.split('v=')[1].split('&')[0]; } 
+                    else if (url.includes("youtube.com/watch")) { videoId = url.split('/').pop(); }
+                } catch (e) { return ""; }
+                if (videoId) { return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`; }
                 return "";
             }
             
@@ -372,9 +341,7 @@
                     const iframe = document.createElement('iframe');
                     iframe.className = "w-full h-full absolute top-0 left-0";
                     iframe.src = videoUrl;
-                    iframe.setAttribute('frameborder', '0');
                     iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
-                    iframe.setAttribute('allowfullscreen', true);
                     container.appendChild(iframe);
                 } else {
                     container.innerHTML = '<span class="text-white">Vídeo não configurado</span>';
@@ -396,58 +363,54 @@
             });
 
             // --- HISTORY ---
-            function renderHistoryDates() {
-                const container = document.getElementById('historyDatesList');
-                container.innerHTML = Object.keys(historyEvents).map(date => {
-                    const hasFires = historyEvents[date].events.some(e => e.type === "fire");
-                    return `<button data-date="${date}" class="p-3 w-40 text-center ${hasFires ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`;
-                }).join('');
+            const historyDatesList = document.getElementById('historyDatesList');
+            if (historyDatesList) {
+                renderHistoryDates();
+                historyDatesList.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        const date = e.target.dataset.date;
+                        const data = historyEvents[date];
+                        document.getElementById('historyModalTitle').textContent = `Eventos de ${date}`;
+                        let contentHtml = `<h4 class="font-bold text-lg mb-2">Resumo do Dia</h4><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
+                        data.events.forEach((event, index) => {
+                            contentHtml += `<div class="mb-4"><h5 class="font-semibold ${event.type === 'fire' ? 'text-danger' : 'text-secondary'} mb-2"><i class="fas ${event.type === 'fire' ? 'fa-fire' : 'fa-check-circle'} mr-2"></i>${event.type === 'fire' ? `Incêndio #${index + 1}`: `Atividade #${index + 1}`}</h5>`;
+                            if (event.type === 'fire') {
+                                contentHtml += `<ul class="list-disc list-inside text-gray-700 space-y-1"><li><strong>Local:</strong> ${event.location}</li><li><strong>Resposta:</strong> ${event.responseTime}</li><li><strong>Drones:</strong> ${event.dronesInvolved}</li><li><strong>Recursos:</strong> ${event.resourcesUsed}</li><li><strong>Duração:</strong> ${event.duration}</li></ul>`;
+                            } else {
+                                contentHtml += `<p class="text-gray-700">${event.report}</p>`;
+                            }
+                            contentHtml += `</div>`;
+                        });
+                        document.getElementById('historyModalContent').innerHTML = contentHtml;
+                        historyModal.classList.remove('hidden');
+                    }
+                });
             }
-            document.getElementById('historyDatesList').addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    const date = e.target.dataset.date;
-                    const data = historyEvents[date];
-                    document.getElementById('historyModalTitle').textContent = `Eventos de ${date}`;
-                    let contentHtml = `<h4 class="font-bold text-lg mb-2">Resumo do Dia</h4><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
-                    data.events.forEach((event, index) => {
-                        contentHtml += `<div class="mb-4"><h5 class="font-semibold ${event.type === 'fire' ? 'text-danger' : 'text-secondary'} mb-2"><i class="fas ${event.type === 'fire' ? 'fa-fire' : 'fa-check-circle'} mr-2"></i>${event.type === 'fire' ? `Incêndio #${index + 1}`: `Atividade #${index + 1}`}</h5>`;
-                        if (event.type === 'fire') {
-                            contentHtml += `<ul class="list-disc list-inside text-gray-700 space-y-1"><li><strong>Local:</strong> ${event.location}</li><li><strong>Resposta:</strong> ${event.responseTime}</li><li><strong>Drones:</strong> ${event.dronesInvolved}</li><li><strong>Recursos:</strong> ${event.resourcesUsed}</li><li><strong>Duração:</strong> ${event.duration}</li></ul>`;
-                        } else {
-                            contentHtml += `<p class="text-gray-700">${event.report}</p>`;
-                        }
-                        contentHtml += `</div>`;
-                    });
-                    document.getElementById('historyModalContent').innerHTML = contentHtml;
-                    historyModal.classList.remove('hidden');
-                }
-            });
             document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
+            function renderHistoryDates() {
+                historyDatesList.innerHTML = Object.keys(historyEvents).map(date => `<button data-date="${date}" class="p-3 w-40 text-center ${historyEvents[date].events.some(e=>e.type === 'fire') ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`).join('');
+            }
+            
 
             // --- ADMIN PANEL (USERS) ---
             const userForm = document.getElementById('userForm');
-            
+            window.app = {
+                editUser: (id) => openUserModal(users.find(u => u.id === id)),
+                deleteUser: (id) => {
+                    if (confirm('Tem certeza?')) {
+                        users = users.filter(user => user.id !== id);
+                        renderUsersTable();
+                    }
+                }
+            };
             function renderUsersTable() {
                 const tbody = document.getElementById('usersTableBody');
                 tbody.innerHTML = users.map(user => {
                     let roleClass, roleText;
-                    switch (user.role) {
-                        case 'master': roleClass = 'bg-purple-100 text-purple-800'; roleText = 'Master'; break;
-                        case 'admin': roleClass = 'bg-blue-100 text-blue-800'; roleText = 'Admin'; break;
-                        default: roleClass = 'bg-green-100 text-green-800'; roleText = 'Visualizador';
-                    }
-                    return `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap"><div class="font-medium">${user.username}</div></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleClass}">${roleText}</span></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="window.app.editUser(${user.id})" class="text-secondary hover:text-primary mr-3"><i class="fas fa-edit"></i></button>
-                                <button onclick="window.app.deleteUser(${user.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>`;
+                    switch (user.role) { case 'master': roleClass = 'bg-purple-100 text-purple-800'; roleText = 'Master'; break; case 'admin': roleClass = 'bg-blue-100 text-blue-800'; roleText = 'Admin'; break; default: roleClass = 'bg-green-100 text-green-800'; roleText = 'Visualizador'; }
+                    return `<tr><td class="px-6 py-4"><div class="font-medium">${user.username}</div></td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleClass}">${roleText}</span></td><td class="px-6 py-4 text-right"><button onclick="app.editUser(${user.id})" class="text-secondary hover:text-primary mr-3"><i class="fas fa-edit"></i></button><button onclick="app.deleteUser(${user.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash"></i></button></td></tr>`;
                 }).join('');
             }
-            
             function openUserModal(user = null) {
                 userForm.reset();
                 document.getElementById('userId').value = user ? user.id : '';
@@ -459,37 +422,20 @@
                 }
                 userModal.classList.remove('hidden');
             }
-            
             function saveUser() {
                 const id = document.getElementById('userId').value;
                 const username = document.getElementById('usernameInput').value.trim();
                 const password = document.getElementById('passwordInput').value.trim();
                 const role = document.getElementById('roleInput').value;
                 if (!username || !password) return alert('Preencha todos os campos.');
-
-                if (id) { // Edit
-                    const user = users.find(u => u.id == id);
-                    if (user) Object.assign(user, { username, password, role });
-                } else { // Add
+                if (id) { Object.assign(users.find(u => u.id == id), { username, password, role }); }
+                else {
                     if (users.some(u => u.username === username)) return alert('Nome de usuário já existe.');
-                    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-                    users.push({ id: newId, username, password, role });
+                    users.push({ id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1, username, password, role });
                 }
                 renderUsersTable();
                 userModal.classList.add('hidden');
             }
-
-            // Expose functions to window object
-            window.app = {
-                editUser: (id) => openUserModal(users.find(u => u.id === id)),
-                deleteUser: (id) => {
-                    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-                        users = users.filter(user => user.id !== id);
-                        renderUsersTable();
-                    }
-                }
-            };
-            
             document.getElementById('addUserBtn').addEventListener('click', () => openUserModal());
             document.getElementById('saveUser').addEventListener('click', saveUser);
             document.getElementById('cancelModal').addEventListener('click', () => userModal.classList.add('hidden'));
@@ -497,4 +443,5 @@
         });
     </script>
 </body>
+
 </html>
