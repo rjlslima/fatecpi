@@ -80,7 +80,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            pointer-events: yes;
+            pointer-events: none;
         }
         .map-controls {
             position: absolute;
@@ -395,7 +395,7 @@
                                     </button>
                                 </div>
                                 <div class="relative h-full p-4">
-                                    <div class="temperature absolute top-16 right-4 p-3 bg-black/70 text-white rounded-lg z-10">
+                                    <div class="temperature absolute top-4 right-4 p-3 bg-black/70 text-white rounded-lg z-10">
                                         <span class="font-bold">38°C</span> Temperatura Média
                                     </div>
                                                                         
@@ -1392,14 +1392,8 @@
                 }
                 
                 // Update summary
-                const fireCount = events.filter(e => e.type === 'fire').length;
-                if(fireCount > 0) {
-                    document.getElementById('historySummarySection').classList.remove('hidden');
-                    document.getElementById('historySummaryText').textContent = historyEvents[date].summary;
-                } else {
-                    document.getElementById('historySummarySection').classList.remove('hidden');
-                    document.getElementById('historySummaryText').textContent = historyEvents[date].summary;
-                }
+                document.getElementById('historySummarySection').classList.remove('hidden');
+                document.getElementById('historySummaryText').textContent = historyEvents[date].summary;
                 
                 // Add event listeners for image uploads
                 setupHistoryImageUploads(date);
