@@ -32,33 +32,15 @@
             background-size: cover;
         }
 
-        .map-container {
+        .map-container,
+        .video-container {
             position: relative;
+            width: 100%;
             height: 100%;
         }
 
-        .temperature {
-            background: linear-gradient(45deg, #c70039, #ff5733, #ffc300);
-            animation: heat-pulse 2s infinite alternate;
-        }
-
-        .drone-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        @keyframes heat-pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(199, 0, 57, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(199, 0, 57, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(199, 0, 57, 0);
-            }
+        .aspect-video {
+            aspect-ratio: 16 / 9;
         }
 
         .active-menu {
@@ -80,6 +62,20 @@
             width: 100%;
             height: 100%;
             border: none;
+        }
+        
+        @keyframes droneMove {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(5px, 5px); }
+            50% { transform: translate(10px, 0); }
+            75% { transform: translate(5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .drone-marker {
+            animation: droneMove 8s infinite linear;
+            position: absolute;
+            z-index: 10;
         }
     </style>
 </head>
@@ -120,19 +116,10 @@
                 </div>
             </div>
 
-            <div class="mb-6 flex items-center">
-                <input type="checkbox" id="remember" class="mr-2">
-                <label for="remember" class="text-gray-600">Lembrar-me</label>
-            </div>
-
             <button type="submit"
                 class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300">
                 Entrar <i class="fas fa-sign-in-alt ml-2"></i>
             </button>
-
-            <div class="mt-6 text-center">
-                <a href="#" class="text-secondary hover:text-primary text-sm">Esqueceu a senha?</a>
-            </div>
         </form>
 
         <div class="bg-gray-100 p-4 text-center text-sm text-gray-600">
@@ -142,7 +129,7 @@
 
     <div id="mainApp" class="w-full h-screen bg-gray-50 overflow-hidden hidden">
         <div class="w-full bg-white shadow-sm flex items-center justify-between p-4">
-            <div class="flex items-center">
+             <div class="flex items-center">
                 <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                     <i class="fas fa-fire text-white text-xl"></i>
                 </div>
@@ -151,19 +138,13 @@
                     <p class="text-xs text-gray-500">Sistema de Gestão de Combate a Incêndios</p>
                 </div>
             </div>
-
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <button class="p-2 text-gray-600 hover:text-secondary">
-                        <i class="fas fa-bell text-xl"></i>
-                    </button>
+                    <button class="p-2 text-gray-600 hover:text-secondary"><i class="fas fa-bell text-xl"></i></button>
                     <span class="absolute top-0 right-0 w-3 h-3 bg-danger rounded-full"></span>
                 </div>
-
                 <div class="flex items-center">
-                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
-                        <i class="fas fa-user text-gray-600"></i>
-                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center"><i class="fas fa-user text-gray-600"></i></div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-800" id="currentUsername">Administrador</p>
                         <button id="logoutBtn" class="text-xs text-danger font-medium hover:underline">Sair</button>
@@ -176,245 +157,55 @@
             <div class="w-64 bg-white shadow-lg">
                 <nav class="mt-6">
                     <ul>
-                        <li>
-                            <a href="#" data-view="dashboard"
-                                class="flex items-center p-4 text-gray-600 hover:bg-gray-100 active-menu">
-                                <i class="fas fa-home mr-3 text-secondary"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-view="realTime" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
-                                <i class="fas fa-map-marked-alt mr-3 text-secondary"></i>
-                                <span>Monitoramento em Tempo Real</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-view="towerCamera"
-                                class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
-                                <i class="fas fa-video mr-3 text-secondary"></i>
-                                <span>Câmera de Torre</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-view="history" class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
-                                <i class="fas fa-calendar-day mr-3 text-secondary"></i>
-                                <span>Histórico</span>
-                            </a>
-                        </li>
-                        <li id="adminPanelLink" class="hidden">
-                            <a href="#" data-view="adminPanel"
-                                class="flex items-center p-4 text-gray-600 hover:bg-gray-100">
-                                <i class="fas fa-users-cog mr-3 text-secondary"></i>
-                                <span>Painel Administrativo</span>
-                            </a>
-                        </li>
+                        <li><a href="#" data-view="dashboard" class="flex items-center p-4 text-gray-600 hover:bg-gray-100 active-menu"><i class="fas fa-home mr-3 text-secondary"></i><span>Dashboard</span></a></li>
+                        <li><a href="#" data-view="realTime" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-map-marked-alt mr-3 text-secondary"></i><span>Monitoramento em Tempo Real</span></a></li>
+                        <li><a href="#" data-view="towerCamera" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-video mr-3 text-secondary"></i><span>Câmera de Torre</span></a></li>
+                        <li><a href="#" data-view="history" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-calendar-day mr-3 text-secondary"></i><span>Histórico</span></a></li>
+                        <li id="adminPanelLink" class="hidden"><a href="#" data-view="adminPanel" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-users-cog mr-3 text-secondary"></i><span>Painel Administrativo</span></a></li>
                     </ul>
                 </nav>
-
-                <div class="absolute bottom-0 w-64 p-4 border-t border-gray-200">
-                    <div class="bg-green-50 rounded-lg p-3 border border-green-200">
-                        <p class="text-xs text-center text-green-800">
-                            <i class="fas fa-circle text-green-500 text-[8px] mr-1"></i>
-                            Todos os sistemas operacionais
-                        </p>
-                    </div>
-                </div>
             </div>
 
-            <div class="flex-1 overflow-auto">
-                <div id="dashboard" class="p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="text-2xl font-bold text-gray-800">Visão Geral</h1>
-                    </div>
-
+            <div class="flex-1 overflow-auto p-6">
+                <div id="dashboard">
+                     <h1 class="text-2xl font-bold text-gray-800 mb-6">Visão Geral</h1>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <div class="flex items-center">
-                                <div class="p-3 bg-green-100 rounded-lg">
-                                    <i class="fas fa-fire text-danger text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-gray-500">Incêndios Ativos</p>
-                                    <h3 class="text-2xl font-bold">2</h3>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <div class="flex items-center">
-                                <div class="p-3 bg-green-100 rounded-lg">
-                                    <i class="fas fa-fire-extinguisher text-primary text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-gray-500">Drones Disponíveis</p>
-                                    <h3 class="text-2xl font-bold">7/7</h3>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <div class="flex items-center">
-                                <div class="p-3 bg-green-100 rounded-lg">
-                                    <i class="fas fa-temperature-high text-warning text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-gray-500">Temperatura Média</p>
-                                    <h3 class="text-2xl font-bold">32°C</h3>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <div class="flex items-center">
-                                <div class="p-3 bg-green-100 rounded-lg">
-                                    <i class="fas fa-tachometer-alt text-secondary text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-gray-500">Resposta Média</p>
-                                    <h3 class="text-2xl font-bold">5.2 min</h3>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire text-danger text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Incêndios Ativos</p><h3 class="text-2xl font-bold">2</h3></div></div>
+                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire-extinguisher text-primary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Drones Disponíveis</p><h3 class="text-2xl font-bold">7/7</h3></div></div>
+                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-temperature-high text-warning text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Temperatura Média</p><h3 class="text-2xl font-bold">32°C</h3></div></div>
+                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-tachometer-alt text-secondary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Resposta Média</p><h3 class="text-2xl font-bold">5.2 min</h3></div></div>
                     </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <h2 class="text-lg font-semibold mb-4">Atividade Recente</h2>
-                            <div class="space-y-4">
-                                <div class="flex items-center border-b pb-3">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-play text-green-600"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="font-medium">Drone VTNT-03 iniciou combate</p>
-                                        <p class="text-sm text-gray-500">2 minutos atrás</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center border-b pb-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-map-marked-alt text-blue-600"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="font-medium">Área de risco identificada</p>
-                                        <p class="text-sm text-gray-500">15 minutos atrás</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-sync-alt text-purple-600"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="font-medium">Drone RFLP-02 recarregado</p>
-                                        <p class="text-sm text-gray-500">30 minutos atrás</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow p-5">
-                            <h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2>
-                            <div class="h-64 rounded-lg overflow-hidden relative">
-                                <div class="map-container rounded-lg" id="riskAreaMap">
-                                    <iframe class="google-maps-iframe" src="" allowfullscreen="" loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade">
-                                    </iframe>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone RFLP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
+                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
                     </div>
                 </div>
 
-                <div id="realTime" class="p-0 hidden">
-                    <div class="flex flex-col lg:flex-row h-[calc(100vh-73px)]">
-                        <div class="w-full lg:w-1/3 bg-white shadow-inner p-4 overflow-auto">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-xl font-bold text-gray-800">Frota de Combate</h2>
-                            </div>
-                            <div class="space-y-4" id="droneListContainer">
-                                </div>
-                        </div>
-                        <div class="w-full lg:w-2/3 relative">
-                            <div class="map-container h-full" id="realTimeMap">
-                                <iframe class="google-maps-iframe" src="" allowfullscreen="" loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade">
-                                </iframe>
-                                <div class="absolute top-4 right-4 z-10">
-                                     <button id="recenterMap" class="bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded shadow">
-                                        <i class="fas fa-crosshairs"></i> Recentralizar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                <div id="realTime" class="hidden">
+                     <div class="flex flex-col lg:flex-row h-full gap-6">
+                        <div class="w-full lg:w-1/3 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
+                        <div class="w-full lg:w-2/3 relative h-full rounded-xl overflow-hidden shadow-lg"><div class="map-container" id="realTimeMap"><iframe class="google-maps-iframe" src=""></iframe></div></div>
+                    </div>
+                </div>
+                
+                <div id="towerCamera" class="hidden">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1><button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition"><i class="fas fa-cog mr-2"></i>Configurar Vídeos</button></div>
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Normal</h2><div id="normalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
+                        <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Térmica</h2><div id="thermalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                     </div>
                 </div>
 
-                <div id="towerCamera" class="p-6 hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1>
-                        <button id="configureVideosBtn"
-                            class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
-                            <i class="fas fa-cog mr-2"></i>Configurar Vídeos
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="towerVideosContainer">
-                        <div class="bg-white rounded-xl shadow p-4">
-                            <h2 class="text-lg font-semibold mb-4">Visão Normal</h2>
-                            <div id="normalVideoContainer" class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden flex items-center justify-center text-white">
-                                 Vídeo não configurado
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow p-4">
-                            <h2 class="text-lg font-semibold mb-4">Visão Térmica</h2>
-                            <div id="thermalVideoContainer" class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden flex items-center justify-center text-white">
-                                Vídeo não configurado
-                            </div>
-                        </div>
-                    </div>
+                <div id="history" class="hidden">
+                    <div class="text-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Histórico de Incidentes</h1><p class="text-gray-500">Clique em uma data para ver os detalhes.</p></div>
+                    <div class="bg-white rounded-xl shadow p-4"><div id="historyDatesList" class="flex flex-wrap justify-center gap-4"></div></div>
                 </div>
 
-                <div id="history" class="p-6 hidden">
-                    <div class="text-center mb-6">
-                        <h1 class="text-2xl font-bold text-gray-800">Histórico de Incidentes</h1>
-                         <p class="text-gray-500">Clique em uma data para ver os detalhes do evento.</p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow p-4">
-                        <div id="historyDatesList" class="flex flex-wrap justify-center gap-4">
-                            </div>
-                    </div>
-                </div>
-
-                <div id="adminPanel" class="p-6 hidden">
+                <div id="adminPanel" class="hidden">
                      <h1 class="text-2xl font-bold text-gray-800 mb-6">Painel Administrativo</h1>
                     <div class="bg-white rounded-xl shadow overflow-hidden">
-                        <div class="p-4 bg-gray-50 border-b">
-                            <button id="addUserBtn"
-                                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
-                                <i class="fas fa-plus mr-2"></i>Adicionar Usuário
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Usuário</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Nível de Acesso</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
-                                    </tbody>
-                            </table>
-                        </div>
+                        <div class="p-4 bg-gray-50 border-b"><button id="addUserBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition"><i class="fas fa-plus mr-2"></i>Adicionar Usuário</button></div>
+                        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nível de Acesso</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th></tr></thead><tbody class="bg-white divide-y divide-gray-200" id="usersTableBody"></tbody></table></div>
                     </div>
                 </div>
             </div>
@@ -422,207 +213,84 @@
     </div>
     
     <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-lg w-full max-w-md">
+            <div class="p-4 border-b flex justify-between items-center"><h3 class="text-lg font-semibold" id="modalTitle">Adicionar Usuário</h3><button id="cancelModal" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
+            <div class="p-4"><form id="userForm"><input type="hidden" id="userId"><div class="mb-4"><label class="block text-gray-700 mb-2">Usuário</label><input type="text" id="usernameInput" class="w-full px-4 py-2 border rounded-lg" required></div><div class="mb-4"><label class="block text-gray-700 mb-2">Senha</label><input type="password" id="passwordInput" class="w-full px-4 py-2 border rounded-lg" required></div><div class="mb-4"><label class="block text-gray-700 mb-2">Nível de Acesso</label><select id="roleInput" class="w-full px-4 py-2 border rounded-lg" required><option value="master">Master</option><option value="admin">Administrador</option><option value="viewer">Visualizador</option></select></div></form></div>
+            <div class="p-4 border-t flex justify-end"><button id="saveUser" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button></div>
         </div>
+    </div>
     <div id="configureVideosModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
          <div class="bg-white rounded-lg w-full max-w-md">
-            <div class="p-4 border-b flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Configurar Vídeos da Torre</h3>
-                <button id="cancelConfigureVideos" class="text-gray-500 hover:text-gray-800">&times;</button>
-            </div>
+            <div class="p-4 border-b flex justify-between items-center"><h3 class="text-lg font-semibold">Configurar Vídeos da Torre</h3><button id="cancelConfigureVideos" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
             <div class="p-4 space-y-4">
-                <div>
-                    <label for="normalVideoUrl" class="block font-medium mb-1">URL do Vídeo Normal (YouTube)</label>
-                    <input type="text" id="normalVideoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg">
-                </div>
-                <div>
-                    <label for="thermalVideoUrl" class="block font-medium mb-1">URL do Vídeo Térmico (YouTube)</label>
-                    <input type="text" id="thermalVideoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg">
-                </div>
+                <div><label for="normalVideoUrl" class="block font-medium mb-1">URL do Vídeo Normal (YouTube)</label><input type="text" id="normalVideoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label for="thermalVideoUrl" class="block font-medium mb-1">URL do Vídeo Térmico (YouTube)</label><input type="text" id="thermalVideoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg"></div>
             </div>
-            <div class="p-4 border-t flex justify-end">
-                <button id="saveConfiguredVideos" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button>
-            </div>
+            <div class="p-4 border-t flex justify-end"><button id="saveConfiguredVideos" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button></div>
         </div>
     </div>
     <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto">
-            <div class="p-4 border-b flex justify-between items-center sticky top-0 bg-white">
-                <h3 class="text-lg font-semibold" id="historyModalTitle">Detalhes do Evento</h3>
-                <button id="closeHistoryModal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
-            </div>
-            <div class="p-6" id="historyModalContent">
-                </div>
+            <div class="p-4 border-b flex justify-between items-center sticky top-0 bg-white"><h3 class="text-lg font-semibold" id="historyModalTitle"></h3><button id="closeHistoryModal" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
+            <div class="p-6" id="historyModalContent"></div>
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- DATA ---
             let currentUser = { username: 'admin', role: 'master' };
-            let users = [
-                { id: 1, username: 'admin', role: 'master', password: 'admin' },
-                { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' },
-                { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }
-            ];
+            let users = [ { id: 1, username: 'admin', role: 'master', password: 'admin' }, { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' }, { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }];
             let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "RFLP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "RFLP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "RFLP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
-            let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes. Todos os sistemas operando normalmente." }, { type: "safe", report: "Manutenção preventiva realizada na frota de drones." }], summary: "Dia sem incidentes. Todos os drones passaram por manutenção preventiva." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2 - Coordenadas: -20.935, -48.492", responseTime: "8 minutos", dronesInvolved: "RFLP-02, VTNT-05", resourcesUsed: "75l RFLP, 250l Água", duration: "25 minutos" }, { type: "fire", location: "Setor B1 - Coordenadas: -20.928, -48.501", responseTime: "12 minutos", dronesInvolved: "RFLP-03, VTNT-06", resourcesUsed: "60l RFLP, 450l Água", duration: "35 minutos" }], summary: "2 focos de incêndio detectados. Tempo médio de resposta: 10 minutos. Total de recursos usados: 135l RFLP, 700l Água." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3 - Coordenadas: -20.933, -48.505", responseTime: "15 minutos", dronesInvolved: "RFLP-01, VTNT-03", resourcesUsed: "90l RFLP, 600l Água", duration: "45 minutos" }], summary: "1 foco de incêndio de média intensidade. Tempo total de combate: 45 minutos. Recursos usados: 90l RFLP, 600l Água." } };
+            let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "RFLP-02, VTNT-05", resourcesUsed: "75l RFLP, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "RFLP-01, VTNT-03", resourcesUsed: "90l RFLP, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             let towerVideos = { normalVideo: "", thermalVideo: "" };
-            
             const fixedCoords = "-20.906886,-48.420668";
 
             // --- DOM Elements ---
-            const loginScreen = document.getElementById('loginScreen');
             const mainApp = document.getElementById('mainApp');
-            const loginForm = document.getElementById('loginForm');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const views = document.querySelectorAll('[data-view]');
             const contentSections = document.querySelectorAll('.flex-1 > div[id]');
-            const currentUsernameDisplay = document.getElementById('currentUsername');
-            const adminPanelLink = document.getElementById('adminPanelLink');
-            
-            const configureVideosBtn = document.getElementById('configureVideosBtn');
+            // Modals
             const configureVideosModal = document.getElementById('configureVideosModal');
-            const cancelConfigureVideosBtn = document.getElementById('cancelConfigureVideos');
-            const saveConfiguredVideosBtn = document.getElementById('saveConfiguredVideos');
-            
             const historyModal = document.getElementById('historyModal');
-            const closeHistoryModalBtn = document.getElementById('closeHistoryModal');
+            const userModal = document.getElementById('userModal');
 
-            // --- FUNCTIONS ---
-
-            // MAPS
-            function initializeMaps() {
-                const mapUrl = `https://maps.google.com/maps?q=${fixedCoords}&t=k&z=15&ie=UTF8&iwloc=&output=embed`;
-                document.querySelector('#riskAreaMap iframe').src = mapUrl;
-                document.querySelector('#realTimeMap iframe').src = mapUrl;
-            }
-
-            // VIDEOS
-            function convertYoutubeUrlToEmbed(url) {
-                if (!url) return "";
-                let videoId = '';
-                try {
-                    const urlObj = new URL(url);
-                    if (urlObj.hostname === 'youtu.be') {
-                        videoId = urlObj.pathname.slice(1);
-                    } else if (urlObj.hostname.includes('youtube.com')) {
-                        videoId = urlObj.searchParams.get('v');
-                    }
-                } catch (e) {
-                    console.error("Invalid URL for YouTube video:", e);
-                    return "";
-                }
-
-                if (videoId) {
-                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
-                }
-                return "";
-            }
-            
-            function renderTowerVideos() {
-                const normalVideoContainer = document.getElementById('normalVideoContainer');
-                const thermalVideoContainer = document.getElementById('thermalVideoContainer');
-
-                normalVideoContainer.innerHTML = '';
-                if (towerVideos.normalVideo) {
-                    const iframe = document.createElement('iframe');
-                    iframe.className = "w-full h-full";
-                    iframe.src = towerVideos.normalVideo;
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.setAttribute('allow', 'autoplay; encrypted-media');
-                    iframe.setAttribute('allowfullscreen', true);
-                    normalVideoContainer.appendChild(iframe);
-                } else {
-                    normalVideoContainer.innerHTML = '<span class="text-white">Vídeo não configurado</span>';
-                }
-
-                thermalVideoContainer.innerHTML = '';
-                 if (towerVideos.thermalVideo) {
-                    const iframe = document.createElement('iframe');
-                    iframe.className = "w-full h-full";
-                    iframe.src = towerVideos.thermalVideo;
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.setAttribute('allow', 'autoplay; encrypted-media');
-                    iframe.setAttribute('allowfullscreen', true);
-                    thermalVideoContainer.appendChild(iframe);
-                } else {
-                     thermalVideoContainer.innerHTML = '<span class="text-white">Vídeo não configurado</span>';
-                }
-            }
-            
-            function saveVideoConfig() {
-                 const normalUrl = document.getElementById('normalVideoUrl').value.trim();
-                 const thermalUrl = document.getElementById('thermalVideoUrl').value.trim();
-                 towerVideos.normalVideo = convertYoutubeUrlToEmbed(normalUrl);
-                 towerVideos.thermalVideo = convertYoutubeUrlToEmbed(thermalUrl);
-                 renderTowerVideos();
-                 configureVideosModal.classList.add('hidden');
-            }
-
-
-            // HISTORY
-            function renderHistoryDates() {
-                const container = document.getElementById('historyDatesList');
-                container.innerHTML = '';
-                Object.keys(historyEvents).forEach(date => {
-                    const hasFires = historyEvents[date].events.some(e => e.type === "fire");
-                    const dateEl = document.createElement('button');
-                    dateEl.className = `p-3 w-40 text-center ${hasFires ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition`;
-                    dateEl.textContent = date;
-                    dateEl.addEventListener('click', () => showHistoryPopup(date));
-                    container.appendChild(dateEl);
-                });
-            }
-
-            function showHistoryPopup(date) {
-                const data = historyEvents[date];
-                const modalTitle = document.getElementById('historyModalTitle');
-                const modalContent = document.getElementById('historyModalContent');
-
-                modalTitle.textContent = `Eventos de ${date}`;
-                let contentHtml = `<h3 class="font-bold text-lg mb-2">Resumo do Dia</h3><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
-                
-                data.events.forEach((event, index) => {
-                    contentHtml += `<div class="mb-4">`;
-                    if (event.type === 'fire') {
-                        contentHtml += `<h4 class="font-semibold text-danger mb-2"><i class="fas fa-fire mr-2"></i>Incêndio Reportado #${index + 1}</h4>`;
-                        contentHtml += `<ul class="list-disc list-inside space-y-1">
-                                            <li><strong>Localização:</strong> ${event.location}</li>
-                                            <li><strong>Tempo de resposta:</strong> ${event.responseTime}</li>
-                                            <li><strong>Drones envolvidos:</strong> ${event.dronesInvolved}</li>
-                                            <li><strong>Recursos usados:</strong> ${event.resourcesUsed}</li>
-                                            <li><strong>Duração do combate:</strong> ${event.duration}</li>
-                                       </ul>`;
-                    } else {
-                         contentHtml += `<h4 class="font-semibold text-secondary mb-2"><i class="fas fa-check-circle mr-2"></i>Relatório de Atividade #${index + 1}</h4>`;
-                         contentHtml += `<p>${event.report}</p>`;
-                    }
-                     contentHtml += `</div>`;
-                });
-
-                modalContent.innerHTML = contentHtml;
-                historyModal.classList.remove('hidden');
-            }
-
-            // --- GENERAL APP FLOW ---
+            // --- GENERAL APP FLOW & NAVIGATION ---
             function showView(viewName) {
                 contentSections.forEach(section => section.classList.add('hidden'));
                 const activeSection = document.getElementById(viewName);
                 if (activeSection) {
                     activeSection.classList.remove('hidden');
+                    // Call render functions based on the view
+                    if(viewName === 'realTime') {
+                        renderDronesList();
+                        renderDroneMarkers();
+                    } else if (viewName === 'adminPanel') {
+                        renderUsersTable();
+                    } else if (viewName === 'history') {
+                        renderHistoryDates();
+                    }
                 }
             }
 
-            // --- EVENT LISTENERS ---
-            loginForm.addEventListener('submit', (e) => {
+            document.querySelectorAll('[data-view]').forEach(view => {
+                view.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const viewName = this.getAttribute('data-view');
+                    showView(viewName);
+                    document.querySelectorAll('[data-view]').forEach(v => v.classList.remove('active-menu'));
+                    this.classList.add('active-menu');
+                });
+            });
+
+            // --- LOGIN / LOGOUT ---
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const user = users.find(u => u.username === username.value && u.password === password.value);
+                const user = users.find(u => u.username === document.getElementById('username').value && u.password === document.getElementById('password').value);
                 if (user) {
                     currentUser = user;
-                    currentUsernameDisplay.textContent = user.username;
-                    adminPanelLink.classList.toggle('hidden', user.role !== 'master' && user.role !== 'admin');
-                    loginScreen.classList.add('hidden');
+                    document.getElementById('currentUsername').textContent = user.username;
+                    document.getElementById('adminPanelLink').classList.toggle('hidden', user.role !== 'master' && user.role !== 'admin');
+                    document.getElementById('loginScreen').classList.add('hidden');
                     mainApp.classList.remove('hidden');
                     initializeMaps();
                     showView('dashboard');
@@ -631,36 +299,202 @@
                 }
             });
 
-            logoutBtn.addEventListener('click', () => {
+            document.getElementById('logoutBtn').addEventListener('click', () => {
                 mainApp.classList.add('hidden');
-                loginScreen.classList.remove('hidden');
-                loginForm.reset();
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('loginForm').reset();
             });
 
-            views.forEach(view => {
-                view.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const viewName = this.getAttribute('data-view');
-                    showView(viewName);
-                    views.forEach(v => v.classList.remove('active-menu'));
-                    this.classList.add('active-menu');
+            // --- MAPS ---
+            function initializeMaps() {
+                const mapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr8{fixedCoords}&t=k&z=15&ie=UTF8&iwloc=&output=embed`;
+                document.querySelector('#riskAreaMap iframe').src = mapUrl;
+                document.querySelector('#realTimeMap iframe').src = mapUrl;
+            }
+
+            // --- REAL-TIME MONITORING ---
+            function renderDronesList() {
+                const container = document.getElementById('droneListContainer');
+                container.innerHTML = drones.map(drone => `
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div class="flex items-start">
+                            <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start"><h3 class="font-semibold">${drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span></div>
+                                <div class="grid grid-cols-2 mt-2 gap-2 text-sm">
+                                    <div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
+                                    <div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
+                                    ${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function renderDroneMarkers() {
+                const mapContainer = document.getElementById('realTimeMap');
+                // Clear old markers first
+                mapContainer.querySelectorAll('.drone-marker').forEach(el => el.remove());
+                drones.forEach(drone => {
+                    const marker = document.createElement('div');
+                    marker.className = 'drone-marker';
+                    marker.style.left = drone.position.left;
+                    marker.style.top = drone.position.top;
+                    marker.innerHTML = `<div class="w-8 h-8 rounded-full ${drone.iconColor.replace('text-', 'bg-')} flex items-center justify-center border-2 border-white shadow-lg"><i class="fas ${drone.icon} text-white text-sm"></i></div>`;
+                    mapContainer.appendChild(marker);
                 });
+            }
+
+            // --- TOWER VIDEOS ---
+            function convertYoutubeUrlToEmbed(url) {
+                if (!url) return "";
+                let videoId = '';
+                try {
+                    if (url.includes("youtu.be/")) {
+                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    } else if (url.includes("youtube.com/watch")) {
+                        const urlParams = new URLSearchParams(new URL(url).search);
+                        videoId = urlParams.get('v');
+                    }
+                } catch (e) { console.error("Invalid YouTube URL"); return ""; }
+                
+                if (videoId) {
+                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
+                }
+                return "";
+            }
+            
+            function renderVideo(containerId, videoUrl) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                if (videoUrl) {
+                    const iframe = document.createElement('iframe');
+                    iframe.className = "w-full h-full absolute top-0 left-0";
+                    iframe.src = videoUrl;
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+                    iframe.setAttribute('allowfullscreen', true);
+                    container.appendChild(iframe);
+                } else {
+                    container.innerHTML = '<span class="text-white">Vídeo não configurado</span>';
+                }
+            }
+
+            document.getElementById('configureVideosBtn').addEventListener('click', () => {
+                document.getElementById('normalVideoUrl').value = '';
+                document.getElementById('thermalVideoUrl').value = '';
+                configureVideosModal.classList.remove('hidden');
             });
-            
-            document.getElementById('recenterMap').addEventListener('click', initializeMaps);
+            document.getElementById('cancelConfigureVideos').addEventListener('click', () => configureVideosModal.classList.add('hidden'));
+            document.getElementById('saveConfiguredVideos').addEventListener('click', () => {
+                 towerVideos.normalVideo = convertYoutubeUrlToEmbed(document.getElementById('normalVideoUrl').value.trim());
+                 towerVideos.thermalVideo = convertYoutubeUrlToEmbed(document.getElementById('thermalVideoUrl').value.trim());
+                 renderVideo('normalVideoContainer', towerVideos.normalVideo);
+                 renderVideo('thermalVideoContainer', towerVideos.thermalVideo);
+                 configureVideosModal.classList.add('hidden');
+            });
 
-            // Video Modal Listeners
-            configureVideosBtn.addEventListener('click', () => configureVideosModal.classList.remove('hidden'));
-            cancelConfigureVideosBtn.addEventListener('click', () => configureVideosModal.classList.add('hidden'));
-            saveConfiguredVideosBtn.addEventListener('click', saveVideoConfig);
+            // --- HISTORY ---
+            function renderHistoryDates() {
+                const container = document.getElementById('historyDatesList');
+                container.innerHTML = Object.keys(historyEvents).map(date => {
+                    const hasFires = historyEvents[date].events.some(e => e.type === "fire");
+                    return `<button data-date="${date}" class="p-3 w-40 text-center ${hasFires ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`;
+                }).join('');
+            }
+            document.getElementById('historyDatesList').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const date = e.target.dataset.date;
+                    const data = historyEvents[date];
+                    document.getElementById('historyModalTitle').textContent = `Eventos de ${date}`;
+                    let contentHtml = `<h4 class="font-bold text-lg mb-2">Resumo do Dia</h4><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
+                    data.events.forEach((event, index) => {
+                        contentHtml += `<div class="mb-4"><h5 class="font-semibold ${event.type === 'fire' ? 'text-danger' : 'text-secondary'} mb-2"><i class="fas ${event.type === 'fire' ? 'fa-fire' : 'fa-check-circle'} mr-2"></i>${event.type === 'fire' ? `Incêndio #${index + 1}`: `Atividade #${index + 1}`}</h5>`;
+                        if (event.type === 'fire') {
+                            contentHtml += `<ul class="list-disc list-inside text-gray-700 space-y-1"><li><strong>Local:</strong> ${event.location}</li><li><strong>Resposta:</strong> ${event.responseTime}</li><li><strong>Drones:</strong> ${event.dronesInvolved}</li><li><strong>Recursos:</strong> ${event.resourcesUsed}</li><li><strong>Duração:</strong> ${event.duration}</li></ul>`;
+                        } else {
+                            contentHtml += `<p class="text-gray-700">${event.report}</p>`;
+                        }
+                        contentHtml += `</div>`;
+                    });
+                    document.getElementById('historyModalContent').innerHTML = contentHtml;
+                    historyModal.classList.remove('hidden');
+                }
+            });
+            document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
 
-            // History Modal Listeners
-            closeHistoryModalBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
+            // --- ADMIN PANEL (USERS) ---
+            const userForm = document.getElementById('userForm');
             
-            // --- INITIALIZATION ---
-            // The app starts on the login screen, so no view is shown initially.
+            function renderUsersTable() {
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = users.map(user => {
+                    let roleClass, roleText;
+                    switch (user.role) {
+                        case 'master': roleClass = 'bg-purple-100 text-purple-800'; roleText = 'Master'; break;
+                        case 'admin': roleClass = 'bg-blue-100 text-blue-800'; roleText = 'Admin'; break;
+                        default: roleClass = 'bg-green-100 text-green-800'; roleText = 'Visualizador';
+                    }
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap"><div class="font-medium">${user.username}</div></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleClass}">${roleText}</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="window.app.editUser(${user.id})" class="text-secondary hover:text-primary mr-3"><i class="fas fa-edit"></i></button>
+                                <button onclick="window.app.deleteUser(${user.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                }).join('');
+            }
+            
+            function openUserModal(user = null) {
+                userForm.reset();
+                document.getElementById('userId').value = user ? user.id : '';
+                document.getElementById('modalTitle').textContent = user ? 'Editar Usuário' : 'Adicionar Usuário';
+                if (user) {
+                    document.getElementById('usernameInput').value = user.username;
+                    document.getElementById('passwordInput').value = user.password;
+                    document.getElementById('roleInput').value = user.role;
+                }
+                userModal.classList.remove('hidden');
+            }
+            
+            function saveUser() {
+                const id = document.getElementById('userId').value;
+                const username = document.getElementById('usernameInput').value.trim();
+                const password = document.getElementById('passwordInput').value.trim();
+                const role = document.getElementById('roleInput').value;
+                if (!username || !password) return alert('Preencha todos os campos.');
+
+                if (id) { // Edit
+                    const user = users.find(u => u.id == id);
+                    if (user) Object.assign(user, { username, password, role });
+                } else { // Add
+                    if (users.some(u => u.username === username)) return alert('Nome de usuário já existe.');
+                    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+                    users.push({ id: newId, username, password, role });
+                }
+                renderUsersTable();
+                userModal.classList.add('hidden');
+            }
+
+            // Expose functions to window object
+            window.app = {
+                editUser: (id) => openUserModal(users.find(u => u.id === id)),
+                deleteUser: (id) => {
+                    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                        users = users.filter(user => user.id !== id);
+                        renderUsersTable();
+                    }
+                }
+            };
+            
+            document.getElementById('addUserBtn').addEventListener('click', () => openUserModal());
+            document.getElementById('saveUser').addEventListener('click', saveUser);
+            document.getElementById('cancelModal').addEventListener('click', () => userModal.classList.add('hidden'));
+
         });
     </script>
 </body>
-
 </html>
