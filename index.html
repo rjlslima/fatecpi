@@ -190,7 +190,7 @@
                 
                 <div id="towerCamera" class="hidden">
                     <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1><button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition"><i class="fas fa-cog mr-2"></i>Configurar Vídeos</button></div>
-                    <div class="max-w-2xl mx-auto space-y-8">
+                    <div class="max-w-lg mx-auto space-y-8">
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Normal</h2><div id="normalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Térmica</h2><div id="thermalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                     </div>
@@ -296,7 +296,7 @@
 
             // --- MAPS ---
             function initializeMaps() {
-                const mapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119928.2152882134!2d-48.4942802!3d-20.9318346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bbe3ff3103bc1f%3A0x8eb5b8084c6185b5!2sBebedouro%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr8{fixedCoords}&t=k&z=15&ie=UTF8&iwloc=&output=embed`;
+                const mapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d119928.2152882134!2d-48.420668!3d-20.906886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr1?q=${fixedCoords}&t=k&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.querySelector('#riskAreaMap iframe').src = mapUrl;
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
@@ -327,8 +327,8 @@
                 if (!url) return "";
                 let videoId = '';
                 try {
-                    if (url.includes("youtu.be/")) { videoId = url.split('v=')[1].split('&')[0]; } 
-                    else if (url.includes("youtube.com/watch")) { videoId = url.split('/').pop(); }
+                    if (url.includes("v=")) { videoId = url.split('v=')[1].split('&')[0]; } 
+                    else if (url.includes("youtu.be/")) { videoId = url.split('youtu.be/')[1].split('?')[0]; }
                 } catch (e) { return ""; }
                 if (videoId) { return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`; }
                 return "";
@@ -391,7 +391,6 @@
                 historyDatesList.innerHTML = Object.keys(historyEvents).map(date => `<button data-date="${date}" class="p-3 w-40 text-center ${historyEvents[date].events.some(e=>e.type === 'fire') ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`).join('');
             }
             
-
             // --- ADMIN PANEL (USERS) ---
             const userForm = document.getElementById('userForm');
             window.app = {
@@ -443,5 +442,4 @@
         });
     </script>
 </body>
-
 </html>
