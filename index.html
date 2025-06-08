@@ -68,6 +68,18 @@
             position: absolute;
             z-index: 10;
         }
+        .temperature-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-weight: 600;
+            z-index: 20;
+        }
     </style>
 </head>
 
@@ -140,14 +152,21 @@
             </div>
         </div>
         <div class="flex h-[calc(100vh-73px)]">
-            <div class="w-64 bg-white shadow-lg">
+            <div class="w-64 bg-white shadow-lg p-4 flex flex-col">
+                <div>
+                    <h2 class="text-lg font-semibold mb-2 border-b pb-2">Legendas</h2>
+                    <ul class="text-sm text-gray-700 space-y-2 mt-2">
+                        <li><strong class="text-primary">VTNT:</strong> Veículo de Terra Não Tripulado</li>
+                        <li><strong class="text-primary">DARFP:</strong> Drone a Retardante de Fogo a Pó</li>
+                    </ul>
+                </div>
                 <nav class="mt-6">
                     <ul>
-                        <li><a href="#" data-view="dashboard" class="flex items-center p-4 text-gray-600 hover:bg-gray-100 active-menu"><i class="fas fa-home mr-3 text-secondary"></i><span>Dashboard</span></a></li>
-                        <li><a href="#" data-view="realTime" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-map-marked-alt mr-3 text-secondary"></i><span>Monitoramento em Tempo Real</span></a></li>
-                        <li><a href="#" data-view="towerCamera" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-video mr-3 text-secondary"></i><span>Câmera de Torre</span></a></li>
-                        <li><a href="#" data-view="history" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-calendar-day mr-3 text-secondary"></i><span>Histórico</span></a></li>
-                        <li id="adminPanelLink" class="hidden"><a href="#" data-view="adminPanel" class="flex items-center p-4 text-gray-600 hover:bg-gray-100"><i class="fas fa-users-cog mr-3 text-secondary"></i><span>Painel Administrativo</span></a></li>
+                        <li><a href="#" data-view="dashboard" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 active-menu"><i class="fas fa-home mr-3 text-secondary"></i><span>Dashboard</span></a></li>
+                        <li><a href="#" data-view="realTime" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100"><i class="fas fa-map-marked-alt mr-3 text-secondary"></i><span>Monitoramento</span></a></li>
+                        <li><a href="#" data-view="towerCamera" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100"><i class="fas fa-video mr-3 text-secondary"></i><span>Câmera de Torre</span></a></li>
+                        <li><a href="#" data-view="history" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100"><i class="fas fa-calendar-day mr-3 text-secondary"></i><span>Histórico</span></a></li>
+                        <li id="adminPanelLink" class="hidden"><a href="#" data-view="adminPanel" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100"><i class="fas fa-users-cog mr-3 text-secondary"></i><span>Painel Admin</span></a></li>
                     </ul>
                 </nav>
             </div>
@@ -161,14 +180,21 @@
                         <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-tachometer-alt text-secondary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Resposta Média</p><h3 class="text-2xl font-bold">5.2 min</h3></div></div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone RFLP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
+                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
                     </div>
                 </div>
                 <div id="realTime" class="hidden h-full">
-                     <div class="flex flex-col lg:flex-row h-full gap-6">
-                        <div class="w-full lg:w-1/4 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
-                        <div class="w-full lg:w-3/4 h-full relative rounded-xl overflow-hidden shadow-lg"><div class="map-container" id="realTimeMap"><iframe class="google-maps-iframe" src=""></iframe></div></div>
+                     <div class="flex flex-col h-full gap-6">
+                        <div class="h-1/3 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
+                        <div class="h-2/3 relative rounded-xl overflow-hidden shadow-lg">
+                            <div class="map-container" id="realTimeMap">
+                                <iframe class="google-maps-iframe" src=""></iframe>
+                                <div class="temperature-overlay">
+                                    <i class="fas fa-thermometer-half mr-2"></i>Temperatura: <span id="currentTemperature">--</span>°C
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="towerCamera" class="hidden">
@@ -221,19 +247,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             // --- DATA ---
             let users = [ { id: 1, username: 'admin', role: 'master', password: 'admin' }, { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' }, { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }];
-            let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "RFLP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "RFLP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "RFLP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
-            let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "RFLP-02, VTNT-05", resourcesUsed: "75l RFLP, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "RFLP-01, VTNT-03", resourcesUsed: "90l RFLP, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
+            let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "DARFP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "DARFP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "DARFP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
+            let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "DARFP-02, VTNT-05", resourcesUsed: "75l, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "DARFP-01, VTNT-03", resourcesUsed: "90l, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             let towerVideos = { normalVideo: "", thermalVideo: "" };
             const fixedCoords = "-20.839381,-48.328954";
-
-            // --- DOM Elements ---
+            
             const mainApp = document.getElementById('mainApp');
             const contentSections = document.querySelectorAll('.flex-1 > div[id]');
             const configureVideosModal = document.getElementById('configureVideosModal');
             const historyModal = document.getElementById('historyModal');
             const userModal = document.getElementById('userModal');
+            const currentTemperatureSpan = document.getElementById('currentTemperature');
 
-            // --- GENERAL APP FLOW & NAVIGATION ---
             function showView(viewName) {
                 contentSections.forEach(section => section.classList.add('hidden'));
                 const activeSection = document.getElementById(viewName);
@@ -255,7 +280,6 @@
                 });
             });
 
-            // --- LOGIN / LOGOUT ---
             document.getElementById('loginForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const user = users.find(u => u.username === document.getElementById('username').value && u.password === document.getElementById('password').value);
@@ -277,18 +301,16 @@
                 document.getElementById('loginForm').reset();
             });
 
-            // --- MAPS ---
             function initializeMaps() {
                 const mapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d119928.2152882134!2d-48.420668!3d-20.906886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1717799999999!5m2!1spt-BR!2sbr1?q=${fixedCoords}&t=k&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.querySelector('#riskAreaMap iframe').src = mapUrl;
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
 
-            // --- REAL-TIME MONITORING ---
             function renderDronesList() {
                 const container = document.getElementById('droneListContainer');
                 container.innerHTML = drones.map(drone => `
-                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200"><div class="flex items-start"><div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i></div><div class="flex-1"><div class="flex justify-between items-start"><h3 class="font-semibold">${drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span></div><div class="grid grid-cols-2 mt-2 gap-2 text-sm"><div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div><div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-tint' : 'fa-flask'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}</div></div></div></div>`
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200"><div class="flex items-start"><div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl <span class="math-inline">\{drone\.iconColor\}"\></i\></div\><div class\="flex\-1"\><div class\="flex justify\-between items\-start"\><h3 class\="font\-semibold"\></span>{drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium"><span class="math-inline">\{drone\.status\}</span\></div\><div class\="grid grid\-cols\-2 mt\-2 gap\-2 text\-sm"\><div class\="flex items\-center"\><i class\="fas fa\-battery\-full text\-green\-500 mr\-2"\></i\><span\></span>{drone.battery}</span></div><div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span><span class="math-inline">\{drone\.autonomy\}</span\></div\></span>{drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}</div></div></div></div>`
                 ).join('');
             }
 
@@ -305,7 +327,14 @@
                 });
             }
 
-            // --- TOWER VIDEOS ---
+            function updateTemperature() {
+                let temp = parseFloat(currentTemperatureSpan.textContent) || 28;
+                let change = Math.random() * 2 - 1; // -1 to +1
+                temp += change;
+                currentTemperatureSpan.textContent = temp.toFixed(1);
+            }
+            setInterval(updateTemperature, 5000);
+
             function convertYoutubeUrlToEmbed(url) {
                 if (!url) return "";
                 let videoId = '';
@@ -313,7 +342,7 @@
                     if (url.includes("v=")) { videoId = url.split('v=')[1].split('&')[0]; } 
                     else if (url.includes("youtu.be/")) { videoId = url.split('youtu.be/')[1].split('?')[0]; }
                 } catch (e) { return ""; }
-                if (videoId) { return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`; }
+                if (videoId) { return `https://www.youtube.com/embed/<span class="math-inline">\{videoId\}?autoplay\=1&mute\=1&controls\=0&loop\=1&playlist\=</span>{videoId}`; }
                 return "";
             }
             
@@ -332,8 +361,6 @@
             }
 
             document.getElementById('configureVideosBtn').addEventListener('click', () => {
-                document.getElementById('normalVideoUrl').value = '';
-                document.getElementById('thermalVideoUrl').value = '';
                 configureVideosModal.classList.remove('hidden');
             });
             document.getElementById('cancelConfigureVideos').addEventListener('click', () => configureVideosModal.classList.add('hidden'));
@@ -345,36 +372,32 @@
                  configureVideosModal.classList.add('hidden');
             });
 
-            // --- HISTORY ---
             const historyDatesList = document.getElementById('historyDatesList');
-            if (historyDatesList) {
-                renderHistoryDates();
-                historyDatesList.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'BUTTON') {
-                        const date = e.target.dataset.date;
-                        const data = historyEvents[date];
-                        document.getElementById('historyModalTitle').textContent = `Eventos de ${date}`;
-                        let contentHtml = `<h4 class="font-bold text-lg mb-2">Resumo do Dia</h4><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
-                        data.events.forEach((event, index) => {
-                            contentHtml += `<div class="mb-4"><h5 class="font-semibold ${event.type === 'fire' ? 'text-danger' : 'text-secondary'} mb-2"><i class="fas ${event.type === 'fire' ? 'fa-fire' : 'fa-check-circle'} mr-2"></i>${event.type === 'fire' ? `Incêndio #${index + 1}`: `Atividade #${index + 1}`}</h5>`;
-                            if (event.type === 'fire') {
-                                contentHtml += `<ul class="list-disc list-inside text-gray-700 space-y-1"><li><strong>Local:</strong> ${event.location}</li><li><strong>Resposta:</strong> ${event.responseTime}</li><li><strong>Drones:</strong> ${event.dronesInvolved}</li><li><strong>Recursos:</strong> ${event.resourcesUsed}</li><li><strong>Duração:</strong> ${event.duration}</li></ul>`;
-                            } else {
-                                contentHtml += `<p class="text-gray-700">${event.report}</p>`;
-                            }
-                            contentHtml += `</div>`;
-                        });
-                        document.getElementById('historyModalContent').innerHTML = contentHtml;
-                        historyModal.classList.remove('hidden');
-                    }
-                });
-            }
+            renderHistoryDates();
+            historyDatesList.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const date = e.target.dataset.date;
+                    const data = historyEvents[date];
+                    document.getElementById('historyModalTitle').textContent = `Eventos de ${date}`;
+                    let contentHtml = `<h4 class="font-bold text-lg mb-2">Resumo do Dia</h4><p class="mb-6 pb-4 border-b">${data.summary}</p>`;
+                    data.events.forEach((event, index) => {
+                        contentHtml += `<div class="mb-4"><h5 class="font-semibold ${event.type === 'fire' ? 'text-danger' : 'text-secondary'} mb-2"><i class="fas <span class="math-inline">\{event\.type \=\=\= 'fire' ? 'fa\-fire' \: 'fa\-check\-circle'\} mr\-2"\></i\></span>{event.type === 'fire' ? `Incêndio #${index + 1}`: `Atividade #${index + 1}`}</h5>`;
+                        if (event.type === 'fire') {
+                            contentHtml += `<ul class="list-disc list-inside text-gray-700 space-y-1"><li><strong>Local:</strong> ${event.location}</li><li><strong>Resposta:</strong> ${event.responseTime}</li><li><strong>Drones:</strong> ${event.dronesInvolved}</li><li><strong>Recursos:</strong> ${event.resourcesUsed}</li><li><strong>Duração:</strong> ${event.duration}</li></ul>`;
+                        } else {
+                            contentHtml += `<p class="text-gray-700">${event.report}</p>`;
+                        }
+                        contentHtml += `</div>`;
+                    });
+                    document.getElementById('historyModalContent').innerHTML = contentHtml;
+                    historyModal.classList.remove('hidden');
+                }
+            });
             document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
             function renderHistoryDates() {
-                historyDatesList.innerHTML = Object.keys(historyEvents).map(date => `<button data-date="${date}" class="p-3 w-40 text-center ${historyEvents[date].events.some(e=>e.type === 'fire') ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`).join('');
+                historyDatesList.innerHTML = Object.keys(historyEvents).map(date => `<button data-date="${date}" class="p-3 w-40 text-center <span class="math-inline">\{historyEvents\[date\]\.events\.some\(e\=\>e\.type \=\=\= 'fire'\) ? 'bg\-red\-100 hover\:bg\-red\-200 border\-red\-300' \: 'bg\-green\-100 hover\:bg\-green\-200 border\-green\-300'\} border rounded\-lg cursor\-pointer transition"\></span>{date}</button>`).join('');
             }
             
-            // --- ADMIN PANEL (USERS) ---
             const userForm = document.getElementById('userForm');
             window.app = {
                 editUser: (id) => openUserModal(users.find(u => u.id === id)),
@@ -390,7 +413,7 @@
                 tbody.innerHTML = users.map(user => {
                     let roleClass, roleText;
                     switch (user.role) { case 'master': roleClass = 'bg-purple-100 text-purple-800'; roleText = 'Master'; break; case 'admin': roleClass = 'bg-blue-100 text-blue-800'; roleText = 'Admin'; break; default: roleClass = 'bg-green-100 text-green-800'; roleText = 'Visualizador'; }
-                    return `<tr><td class="px-6 py-4"><div class="font-medium">${user.username}</div></td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleClass}">${roleText}</span></td><td class="px-6 py-4 text-right"><button onclick="app.editUser(${user.id})" class="text-secondary hover:text-primary mr-3"><i class="fas fa-edit"></i></button><button onclick="app.deleteUser(${user.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash"></i></button></td></tr>`;
+                    return `<tr><td class="px-6 py-4"><div class="font-medium">${user.username}</div></td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <span class="math-inline">\{roleClass\}"\></span>{roleText}</span></td><td class="px-6 py-4 text-right"><button onclick="app.editUser(<span class="math-inline">\{user\.id\}\)" class\="text\-secondary hover\:text\-primary mr\-3"\><i class\="fas fa\-edit"\></i\></button\><button onclick\="app\.deleteUser\(</span>{user.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash"></i></button></td></tr>`;
                 }).join('');
             }
             function openUserModal(user = null) {
