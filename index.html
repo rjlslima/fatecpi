@@ -26,27 +26,21 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
         }
-
         .login-bg {
             background: url('https://images.unsplash.com/photo-1523309994053-aca3bc0a2304?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center;
             background-size: cover;
         }
-
-        .map-container,
-        .video-container {
+        .map-container, .video-container {
             position: relative;
             width: 100%;
             height: 100%;
         }
-
         .aspect-video {
             aspect-ratio: 16 / 9;
         }
-
         .active-menu {
             position: relative;
         }
-
         .active-menu:after {
             content: '';
             position: absolute;
@@ -57,13 +51,11 @@
             background-color: #2d9c6a;
             border-radius: 3px;
         }
-
         .google-maps-iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-        
         @keyframes droneMove {
             0% { transform: translate(0, 0); }
             25% { transform: translate(5px, 5px); }
@@ -71,7 +63,6 @@
             75% { transform: translate(5px, -5px); }
             100% { transform: translate(0, 0); }
         }
-
         .drone-marker {
             animation: droneMove 8s infinite linear;
             position: absolute;
@@ -90,7 +81,6 @@
                 <p class="text-center text-white/90 mt-1">Gestão de Drones para Combate a Incêndios</p>
             </div>
         </div>
-
         <form id="loginForm" class="p-8">
             <div class="mb-6">
                 <label for="username" class="block text-gray-700 font-medium mb-2">Usuário - fatec</label>
@@ -103,7 +93,6 @@
                         placeholder="Digite seu usuário" required>
                 </div>
             </div>
-
             <div class="mb-6">
                 <label for="password" class="block text-gray-700 font-medium mb-2">Senha - fatec</label>
                 <div class="relative">
@@ -115,13 +104,11 @@
                         placeholder="Digite sua senha" required>
                 </div>
             </div>
-
             <button type="submit"
                 class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300">
                 Entrar <i class="fas fa-sign-in-alt ml-2"></i>
             </button>
         </form>
-
         <div class="bg-gray-100 p-4 text-center text-sm text-gray-600">
             <p>© 2025 DroneGuard System. Todos os direitos reservados.</p>
         </div>
@@ -152,7 +139,6 @@
                 </div>
             </div>
         </div>
-
         <div class="flex h-[calc(100vh-73px)]">
             <div class="w-64 bg-white shadow-lg">
                 <nav class="mt-6">
@@ -165,7 +151,6 @@
                     </ul>
                 </nav>
             </div>
-
             <div class="flex-1 overflow-auto p-6">
                 <div id="dashboard">
                      <h1 class="text-2xl font-bold text-gray-800 mb-6">Visão Geral</h1>
@@ -180,27 +165,23 @@
                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
                     </div>
                 </div>
-
                 <div id="realTime" class="hidden h-full">
                      <div class="flex flex-col lg:flex-row h-full gap-6">
                         <div class="w-full lg:w-1/4 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
                         <div class="w-full lg:w-3/4 h-full relative rounded-xl overflow-hidden shadow-lg"><div class="map-container" id="realTimeMap"><iframe class="google-maps-iframe" src=""></iframe></div></div>
                     </div>
                 </div>
-                
                 <div id="towerCamera" class="hidden">
-                    <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1><button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition"><i class="fas fa-cog mr-2"></i>Configurar Vídeos</button></div>
-                    <div class="max-w-lg mx-auto space-y-8">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Câmeras de Torre</h1><button id="configureVideosBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition hidden"><i class="fas fa-cog mr-2"></i>Configurar Vídeos</button></div>
+                    <div id="towerVideosContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Normal</h2><div id="normalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                         <div class="bg-white rounded-xl shadow p-4"><h2 class="text-lg font-semibold mb-4">Visão Térmica</h2><div id="thermalVideoContainer" class="aspect-video bg-black rounded-lg flex items-center justify-center text-white">Vídeo não configurado</div></div>
                     </div>
                 </div>
-
                 <div id="history" class="hidden">
                     <div class="text-center mb-6"><h1 class="text-2xl font-bold text-gray-800">Histórico de Incidentes</h1><p class="text-gray-500">Clique em uma data para ver os detalhes.</p></div>
                     <div class="bg-white rounded-xl shadow p-4"><div id="historyDatesList" class="flex flex-wrap justify-center gap-4"></div></div>
                 </div>
-
                 <div id="adminPanel" class="hidden">
                      <h1 class="text-2xl font-bold text-gray-800 mb-6">Painel Administrativo</h1>
                     <div class="bg-white rounded-xl shadow overflow-hidden">
@@ -214,7 +195,7 @@
     
     <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white rounded-lg w-full max-w-md">
-            <div class="p-4 border-b flex justify-between items-center"><h3 class="text-lg font-semibold" id="modalTitle">Adicionar Usuário</h3><button id="cancelModal" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
+            <div class="p-4 border-b flex justify-between items-center"><h3 class="text-lg font-semibold" id="modalTitle"></h3><button id="cancelModal" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
             <div class="p-4"><form id="userForm"><input type="hidden" id="userId"><div class="mb-4"><label class="block text-gray-700 mb-2">Usuário</label><input type="text" id="usernameInput" class="w-full px-4 py-2 border rounded-lg" required></div><div class="mb-4"><label class="block text-gray-700 mb-2">Senha</label><input type="password" id="passwordInput" class="w-full px-4 py-2 border rounded-lg" required></div><div class="mb-4"><label class="block text-gray-700 mb-2">Nível de Acesso</label><select id="roleInput" class="w-full px-4 py-2 border rounded-lg" required><option value="master">Master</option><option value="admin">Administrador</option><option value="viewer">Visualizador</option></select></div></form></div>
             <div class="p-4 border-t flex justify-end"><button id="saveUser" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button></div>
         </div>
@@ -280,7 +261,9 @@
                 const user = users.find(u => u.username === document.getElementById('username').value && u.password === document.getElementById('password').value);
                 if (user) {
                     document.getElementById('currentUsername').textContent = user.username;
-                    document.getElementById('adminPanelLink').classList.toggle('hidden', user.role !== 'master' && user.role !== 'admin');
+                    const isAdmin = user.role === 'master' || user.role === 'admin';
+                    document.getElementById('adminPanelLink').classList.toggle('hidden', !isAdmin);
+                    document.getElementById('configureVideosBtn').classList.toggle('hidden', !isAdmin);
                     document.getElementById('loginScreen').classList.add('hidden');
                     mainApp.classList.remove('hidden');
                     initializeMaps();
