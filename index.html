@@ -241,8 +241,8 @@
          <div class="bg-white rounded-lg w-full max-w-md">
              <div class="p-4 border-b flex justify-between items-center"><h3 class="text-lg font-semibold">Configurar Vídeos da Torre</h3><button id="cancelConfigureVideos" class="text-gray-500 hover:text-gray-800 text-2xl">×</button></div>
              <div class="p-4 space-y-4">
-                 <div><label for="normalVideoUrl" class="block font-medium mb-1">URL do Vídeo Normal (YouTube)</label><input type="text" id="normalVideoUrl" placeholder="https://youtu.be/4nA94WchxCI" class="w-full px-3 py-2 border rounded-lg"></div>
-                 <div><label for="thermalVideoUrl" class="block font-medium mb-1">URL do Vídeo Térmico (YouTube)</label><input type="text" id="thermalVideoUrl" placeholder="https://youtu.be/tucPhfotu94" class="w-full px-3 py-2 border rounded-lg"></div>
+                 <div><label for="normalVideoUrl" class="block font-medium mb-1">URL do Vídeo Normal (YouTube)</label><input type="text" id="normalVideoUrl" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" class="w-full px-3 py-2 border rounded-lg"></div>
+                 <div><label for="thermalVideoUrl" class="block font-medium mb-1">URL do Vídeo Térmico (YouTube)</label><input type="text" id="thermalVideoUrl" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" class="w-full px-3 py-2 border rounded-lg"></div>
              </div>
              <div class="p-4 border-t flex justify-end"><button id="saveConfiguredVideos" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">Salvar</button></div>
          </div>
@@ -260,10 +260,9 @@
             let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "DARFP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "DARFP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "DARFP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
             let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "DARFP-02, VTNT-05", resourcesUsed: "75l, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "DARFP-01, VTNT-03", resourcesUsed: "90l, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             
-            // ### VÍDEOS INSERIDOS AQUI ###
             let towerVideos = {
-                normalVideo: "https://www.youtube.com/embed/$1?autoplay=1&mute=1&controls=0&loop=1&playlist=1",
-                thermalVideo: "https://www.youtube.com/embed/$0?autoplay=1&mute=1&controls=0&loop=1&playlist=0"
+                normalVideo: "https://www.youtube.com/embed/1?autoplay=1&mute=1&loop=1&playlist=1&controls=0",
+                thermalVideo: "https://www.youtube.com/embed/0?autoplay=1&mute=1&loop=1&playlist=0&controls=0"
             };
             
             const fixedCoords = "-20.839381,-48.328954";
@@ -283,7 +282,6 @@
                     if(viewName === 'realTime') { renderDronesList(); renderDroneMarkers(); } 
                     else if (viewName === 'adminPanel') { renderUsersTable(); } 
                     else if (viewName === 'history') { renderHistoryDates(); }
-                    // Renderiza os vídeos quando a visualização da câmera da torre é ativada
                     else if (viewName === 'towerCamera') {
                         renderVideo('normalVideoContainer', towerVideos.normalVideo);
                         renderVideo('thermalVideoContainer', towerVideos.thermalVideo);
@@ -323,7 +321,7 @@
             });
 
             function initializeMaps() {
-                const mapUrl = `https://maps.google.com/maps?q=$${fixedCoords}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+                const mapUrl = `https://maps.google.com/maps?q=${fixedCoords}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
                 document.querySelector('#riskAreaMap iframe').src = mapUrl;
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
@@ -360,10 +358,18 @@
                 if (!url) return "";
                 let videoId = '';
                 try {
-                    if (url.includes("v=")) { videoId = url.split('v=')[1].split('&')[0]; } 
-                    else if (url.includes("youtu.be/")) { videoId = url.split('youtu.be/')[1].split('?')[0]; }
-                } catch (e) { return ""; }
-                if (videoId) { return `https://www.youtube.com/embed/$${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`; }
+                    if (url.includes("v=")) {
+                        videoId = new URL(url).searchParams.get("v");
+                    } else if (url.includes("youtu.be/")) {
+                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    }
+                } catch (e) {
+                    console.error("URL do YouTube inválida:", e);
+                    return "";
+                }
+                if (videoId) {
+                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
+                }
                 return "";
             }
             
@@ -374,6 +380,7 @@
                     const iframe = document.createElement('iframe');
                     iframe.src = videoUrl;
                     iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+                    iframe.setAttribute('allowfullscreen', '');
                     container.appendChild(iframe);
                 } else {
                     container.innerHTML = '<span class="text-white">Vídeo não configurado</span>';
