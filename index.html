@@ -261,8 +261,8 @@
             let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "DARFP-02, VTNT-05", resourcesUsed: "75l, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "DARFP-01, VTNT-03", resourcesUsed: "90l, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             
             let towerVideos = {
-                normalVideo: "https://www.youtube.com/embed/1?autoplay=1&mute=1&loop=1&playlist=1&controls=0",
-                thermalVideo: "https://www.youtube.com/embed/0?autoplay=1&mute=1&loop=1&playlist=0&controls=0"
+                normalVideo: "https://youtu.be/4nA94WchxCI",
+                thermalVideo: "https://youtu.be/tucPhfotu94"
             };
             
             const fixedCoords = "-20.839381,-48.328954";
@@ -283,8 +283,8 @@
                     else if (viewName === 'adminPanel') { renderUsersTable(); } 
                     else if (viewName === 'history') { renderHistoryDates(); }
                     else if (viewName === 'towerCamera') {
-                        renderVideo('normalVideoContainer', towerVideos.normalVideo);
-                        renderVideo('thermalVideoContainer', towerVideos.thermalVideo);
+                        renderVideo('normalVideoContainer', convertYoutubeUrlToEmbed(towerVideos.normalVideo));
+                        renderVideo('thermalVideoContainer', convertYoutubeUrlToEmbed(towerVideos.thermalVideo));
                     }
                 }
             }
@@ -354,23 +354,34 @@
             }
             setInterval(updateTemperature, 5000);
 
+            // ===== FUNÇÃO CORRIGIDA =====
             function convertYoutubeUrlToEmbed(url) {
                 if (!url) return "";
-                let videoId = '';
+                let videoId = null;
+
                 try {
-                    if (url.includes("v=")) {
-                        videoId = new URL(url).searchParams.get("v");
-                    } else if (url.includes("youtu.be/")) {
-                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    // Tenta extrair o ID de uma URL padrão do YouTube (ex: ...?v=VIDEO_ID)
+                    const standardUrl = new URL(url);
+                    if (standardUrl.hostname === "www.youtube.com" || standardUrl.hostname === "youtube.com") {
+                        videoId = standardUrl.searchParams.get("v");
+                    } else if (standardUrl.hostname === "youtu.be") {
+                         videoId = standardUrl.pathname.slice(1);
                     }
                 } catch (e) {
-                    console.error("URL do YouTube inválida:", e);
-                    return "";
+                    // Se não for uma URL padrão, tenta extrair o ID do formato personalizado (ex: .../youtube.com/ID)
+                    const match = url.match(/youtube\.com\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) {
+                        videoId = match[1];
+                    }
                 }
+
                 if (videoId) {
-                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}`;
+                    // Constrói a URL de embed correta com os parâmetros de autoplay
+                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}`;
                 }
-                return "";
+
+                console.error("Não foi possível extrair o ID do vídeo da URL:", url);
+                return ""; // Retorna vazio se não conseguir encontrar o ID
             }
             
             function renderVideo(containerId, videoUrl) {
@@ -379,6 +390,7 @@
                 if (videoUrl) {
                     const iframe = document.createElement('iframe');
                     iframe.src = videoUrl;
+                    // O atributo "allow" é essencial para o autoplay funcionar nos navegadores modernos
                     iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
                     iframe.setAttribute('allowfullscreen', '');
                     container.appendChild(iframe);
@@ -388,14 +400,21 @@
             }
 
             document.getElementById('configureVideosBtn').addEventListener('click', () => {
+                document.getElementById('normalVideoUrl').value = towerVideos.normalVideo;
+                document.getElementById('thermalVideoUrl').value = towerVideos.thermalVideo;
                 configureVideosModal.classList.remove('hidden');
             });
             document.getElementById('cancelConfigureVideos').addEventListener('click', () => configureVideosModal.classList.add('hidden'));
             document.getElementById('saveConfiguredVideos').addEventListener('click', () => {
-                 towerVideos.normalVideo = convertYoutubeUrlToEmbed(document.getElementById('normalVideoUrl').value.trim());
-                 towerVideos.thermalVideo = convertYoutubeUrlToEmbed(document.getElementById('thermalVideoUrl').value.trim());
-                 renderVideo('normalVideoContainer', towerVideos.normalVideo);
-                 renderVideo('thermalVideoContainer', towerVideos.thermalVideo);
+                 const normalUrl = document.getElementById('normalVideoUrl').value.trim();
+                 const thermalUrl = document.getElementById('thermalVideoUrl').value.trim();
+                 
+                 towerVideos.normalVideo = normalUrl;
+                 towerVideos.thermalVideo = thermalUrl;
+                 
+                 renderVideo('normalVideoContainer', convertYoutubeUrlToEmbed(normalUrl));
+                 renderVideo('thermalVideoContainer', convertYoutubeUrlToEmbed(thermalUrl));
+                 
                  configureVideosModal.classList.add('hidden');
             });
 
