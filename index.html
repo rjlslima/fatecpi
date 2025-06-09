@@ -326,10 +326,10 @@
                     mapContainer.appendChild(marker);
                 });
             }
-
+            
             function updateTemperature() {
                 let temp = parseFloat(currentTemperatureSpan.textContent) || 28;
-                let change = Math.random() * 2 - 1; // -1 to +1
+                let change = Math.random() - 0.5; // -0.5 to +0.5
                 temp += change;
                 currentTemperatureSpan.textContent = temp.toFixed(1);
             }
