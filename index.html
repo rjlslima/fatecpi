@@ -184,16 +184,30 @@
             <div class="flex-1 overflow-auto p-6">
                 <div id="dashboard">
                      <h1 class="text-2xl font-bold text-gray-800 mb-6">Visão Geral</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire text-danger text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Incêndios Ativos</p><h3 class="text-2xl font-bold">2</h3></div></div>
-                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire-extinguisher text-primary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Drones Disponíveis</p><h3 class="text-2xl font-bold">7/7</h3></div></div>
-                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-temperature-high text-warning text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Temperatura Média</p><h3 class="text-2xl font-bold">32°C</h3></div></div>
-                        <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-tachometer-alt text-secondary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Resposta Média</p><h3 class="text-2xl font-bold">5.2 min</h3></div></div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
-                        <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
-                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire text-danger text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Incêndios Ativos</p><h3 class="text-2xl font-bold">2</h3></div></div>
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-fire-extinguisher text-primary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Drones Disponíveis</p><h3 class="text-2xl font-bold">7/7</h3></div></div>
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-temperature-high text-warning text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Temperatura Média</p><h3 class="text-2xl font-bold">32°C</h3></div></div>
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center"><div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-tachometer-alt text-secondary text-2xl"></i></div><div class="ml-4"><p class="text-gray-500">Resposta Média</p><h3 class="text-2xl font-bold">5.2 min</h3></div></div>
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center">
+                            <div class="p-3 bg-blue-100 rounded-lg"><i class="fas fa-wind text-blue-500 text-2xl"></i></div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Velocidade do Vento</p>
+                                <h3 class="text-2xl font-bold" id="windSpeed">-- km/h</h3>
+                            </div>
+                         </div>
+                         <div class="bg-white rounded-xl shadow p-5 flex items-center">
+                            <div class="p-3 bg-gray-200 rounded-lg"><i class="fas fa-compass text-gray-700 text-2xl"></i></div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Direção do Vento</p>
+                                <h3 class="text-2xl font-bold" id="windDirection">--</h3>
+                            </div>
+                         </div>
+                     </div>
+                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
+                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
+                     </div>
                 </div>
                 <div id="realTime" class="hidden h-full">
                      <div class="flex flex-col h-full gap-6">
@@ -273,6 +287,10 @@
             const historyModal = document.getElementById('historyModal');
             const userModal = document.getElementById('userModal');
             const currentTemperatureSpan = document.getElementById('currentTemperature');
+            // INÍCIO DA MODIFICAÇÃO JS
+            const windSpeedSpan = document.getElementById('windSpeed');
+            const windDirectionSpan = document.getElementById('windDirection');
+            // FIM DA MODIFICAÇÃO JS
 
             function showView(viewName) {
                 contentSections.forEach(section => section.classList.add('hidden'));
@@ -354,21 +372,36 @@
             }
             setInterval(updateTemperature, 5000);
 
-            // ===== FUNÇÃO CORRIGIDA =====
+            // INÍCIO DA NOVA FUNÇÃO PARA ATUALIZAR DADOS DO VENTO
+            function updateWindData() {
+                const speed = (Math.random() * 25 + 5).toFixed(1); // Velocidade do vento entre 5 e 30 km/h
+                const directions = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
+                const direction = directions[Math.floor(Math.random() * directions.length)];
+                
+                if (windSpeedSpan) {
+                    windSpeedSpan.textContent = `${speed} km/h`;
+                }
+                if (windDirectionSpan) {
+                    windDirectionSpan.textContent = direction;
+                }
+            }
+            // Chama a função para definir os valores iniciais e depois atualiza a cada 5 segundos
+            updateWindData();
+            setInterval(updateWindData, 5000);
+            // FIM DA NOVA FUNÇÃO
+
             function convertYoutubeUrlToEmbed(url) {
                 if (!url) return "";
                 let videoId = null;
 
                 try {
-                    // Tenta extrair o ID de uma URL padrão do YouTube (ex: ...?v=VIDEO_ID)
                     const standardUrl = new URL(url);
                     if (standardUrl.hostname === "www.youtube.com" || standardUrl.hostname === "youtube.com") {
                         videoId = standardUrl.searchParams.get("v");
                     } else if (standardUrl.hostname === "youtu.be") {
-                         videoId = standardUrl.pathname.slice(1);
+                        videoId = standardUrl.pathname.slice(1);
                     }
                 } catch (e) {
-                    // Se não for uma URL padrão, tenta extrair o ID do formato personalizado (ex: .../youtube.com/ID)
                     const match = url.match(/youtube\.com\/([a-zA-Z0-9_-]+)/);
                     if (match && match[1]) {
                         videoId = match[1];
@@ -376,12 +409,11 @@
                 }
 
                 if (videoId) {
-                    // Constrói a URL de embed correta com os parâmetros de autoplay
                     return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}`;
                 }
 
                 console.error("Não foi possível extrair o ID do vídeo da URL:", url);
-                return ""; // Retorna vazio se não conseguir encontrar o ID
+                return "";
             }
             
             function renderVideo(containerId, videoUrl) {
@@ -390,7 +422,6 @@
                 if (videoUrl) {
                     const iframe = document.createElement('iframe');
                     iframe.src = videoUrl;
-                    // O atributo "allow" é essencial para o autoplay funcionar nos navegadores modernos
                     iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
                     iframe.setAttribute('allowfullscreen', '');
                     container.appendChild(iframe);
