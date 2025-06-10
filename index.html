@@ -127,7 +127,7 @@
                     </div>
                     <input type="password" id="password"
                         class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-secondary"
-                        placeholder="Digite sua senha" required>
+                        placeholder="Digite sua senha - fatec" required>
                 </div>
             </div>
             <button type="submit"
@@ -171,7 +171,7 @@
                     <h2 class="text-lg font-semibold mb-2 border-b pb-2">Legendas</h2>
                     <ul class="text-sm text-gray-700 space-y-2 mt-2">
                         <li><strong class="text-primary">VTNT:</strong> Veículo de Terra Não Tripulado</li>
-                        <li><strong class="text-primary">DARFP:</strong> Drone Aéreo Retardante de Fogo a Pó</li>
+                        <li><strong class="text-primary">DARFP:</strong> Drone a Retardante de Fogo a Pó</li>
                     </ul>
                 </div>
                 <nav class="flex-grow">
@@ -232,7 +232,7 @@
                             <div class="bg-white rounded-xl shadow p-5">
                                 <h2 class="text-lg font-semibold mb-4">Previsão do Tempo</h2>
                                 <div class="h-[32rem] rounded-lg overflow-hidden">
-                                    <iframe src="https://www.meteoblue.com/pt/tempo/mapas/widget?windAnimation=1&gust=0&satellite=1&cloudsAndPrecipitation=1&temperature=1&sunshine=1&extremeForecastIndex=0&geoloc=fixed&tempunit=C&windunit=km%252Fh&lengthunit=metric&zoom=17&lat=-20.839381&lon=-48.328954&autowidth=auto" frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 100%;"></iframe>
+                                    <iframe src="https://www.meteoblue.com/pt/tempo/mapas/widget/bebedouro_brasil_3470264?windAnimation=1&gust=0&satellite=1&cloudsAndPrecipitation=1&temperature=1&sunshine=1&extremeForecastIndex=0&geoloc=fixed&tempunit=C&windunit=km%252Fh&lengthunit=metric&zoom=10&autowidth=auto" frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 100%;"></iframe>
                                 </div>
                             </div>
                             </div>
@@ -405,7 +405,7 @@
             });
 
             function initializeMaps() {
-                const mapUrl = `https://maps.google.com/maps?q=${fixedCoords}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+                const mapUrl = `https://www.google.com/maps?q=${fixedCoords}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
                 document.querySelector('#riskAreaMap iframe').src = mapUrl;
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
