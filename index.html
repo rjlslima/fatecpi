@@ -124,7 +124,7 @@
                     </div>
                     <input type="password" id="password"
                         class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-secondary"
-                        placeholder="Digite sua senha - fatec" required>
+                        placeholder="Digite sua senha" required>
                 </div>
             </div>
             <button type="submit"
@@ -168,7 +168,7 @@
                     <h2 class="text-lg font-semibold mb-2 border-b pb-2">Legendas</h2>
                     <ul class="text-sm text-gray-700 space-y-2 mt-2">
                         <li><strong class="text-primary">VTNT:</strong> Veículo de Terra Não Tripulado</li>
-                        <li><strong class="text-primary">DARFP:</strong> Drone a Retardante de Fogo a Pó</li>
+                        <li><strong class="text-primary">DARFP:</strong> Drone Aéreo Retardante de Fogo a Pó</li>
                     </ul>
                 </div>
                 <nav class="flex-grow">
@@ -206,7 +206,7 @@
                      </div>
                      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                          <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
-                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-64 rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
+                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-[32rem] rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
                      </div>
                 </div>
                 <div id="realTime" class="hidden h-full">
@@ -285,7 +285,6 @@
                 { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" }, maintenanceIn: '10 dias' }
             ];
             
-            // INÍCIO DA MODIFICAÇÃO: 4 novos itens adicionados ao histórico
             let historyEvents = {
                 '28/05/2024': { events: [{ type: "fire", location: "Setor D5", responseTime: "11 min", dronesInvolved: "VTNT-02, DARFP-01", resourcesUsed: "80l, 350l Água", duration: "30 min" }], summary: "Pequeno foco de incêndio em vegetação seca, controlado rapidamente." },
                 '15/04/2024': { events: [{ type: "safe", report: "Manutenção programada no VTNT-01 concluída." }, { type: "safe", report: "Nenhum alerta de temperatura elevada durante o dia." }], summary: "Dia tranquilo, com atividades de manutenção preventiva." },
@@ -295,7 +294,6 @@
                 '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "DARFP-02, VTNT-05", resourcesUsed: "75l, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." },
                 '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "DARFP-01, VTNT-03", resourcesUsed: "90l, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." }
             };
-            // FIM DA MODIFICAÇÃO
             
             let towerVideos = {
                 normalVideo: "https://youtu.be/_qCtfHbt40U",
@@ -365,32 +363,33 @@
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
             
-            // INÍCIO DA MODIFICAÇÃO: Boxes da lista de drones mais compactos
+            // INÍCIO DA MODIFICAÇÃO: Layout dos drones em Monitoramento mais compacto
             function renderDronesList() {
                 const container = document.getElementById('droneListContainer');
-                container.innerHTML = drones.map(drone => `
+                container.innerHTML = drones.map(drone => {
+                    const capacityInfo = drone.capacity ? `<div class="flex items-center text-xs"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>${drone.capacity}</span></div>` : '';
+                    
+                    return `
                     <div class="bg-gray-50 rounded-xl p-2 border border-gray-200">
-                        <div class="flex items-start">
-                            <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-3">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
                                 <i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i>
                             </div>
                             <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-semibold">${drone.name}</h3>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span>
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-semibold text-sm">${drone.name}</h3>
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span>
                                 </div>
-                                <div class="grid grid-cols-2 mt-1 gap-1 text-sm">
-                                    <div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
-                                    <div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
-                                    ${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}
-                                    <div class="flex items-center col-span-2">
-                                        <i class="fas fa-wrench text-gray-500 mr-2"></i><span>Manutenção em: ${drone.maintenanceIn}</span>
-                                    </div>
+                                <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-sm">
+                                    <div class="flex items-center text-xs"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
+                                    <div class="flex items-center text-xs"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
+                                    ${capacityInfo}
+                                    <div class="flex items-center text-xs"><i class="fas fa-wrench text-gray-500 mr-2"></i><span>${drone.maintenanceIn}</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>`
-                ).join('');
+                }).join('');
             }
             // FIM DA MODIFICAÇÃO
 
