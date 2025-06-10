@@ -91,6 +91,9 @@
             font-weight: 600;
             z-index: 20;
         }
+        #activity-list > div {
+            transition: all 0.5s ease-in-out;
+        }
     </style>
 </head>
 
@@ -204,9 +207,35 @@
                             </div>
                          </div>
                      </div>
-                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Atividade Recente</h2><div class="space-y-4"><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div><div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div><div class="flex items-center"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div></div></div>
-                         <div class="bg-white rounded-xl shadow p-5"><h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2><div class="h-[32rem] rounded-lg overflow-hidden"><div class="map-container rounded-lg" id="riskAreaMap"><iframe class="google-maps-iframe" src=""></iframe></div></div></div>
+                     <div class="flex flex-col gap-6">
+                        <div class="bg-white rounded-xl shadow p-5">
+                            <h2 class="text-lg font-semibold mb-4">Atividade Recente</h2>
+                            <div id="activity-list-container" class="h-48 overflow-hidden relative">
+                               <div id="activity-list" class="space-y-4 absolute inset-0">
+                                   <div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-play text-green-600"></i></div><div class="ml-3"><p class="font-medium">Drone VTNT-03 iniciou combate</p><p class="text-sm text-gray-500">2 minutos atrás</p></div></div>
+                                   <div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-map-marked-alt text-blue-600"></i></div><div class="ml-3"><p class="font-medium">Área de risco identificada</p><p class="text-sm text-gray-500">15 minutos atrás</p></div></div>
+                                   <div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt text-purple-600"></i></div><div class="ml-3"><p class="font-medium">Drone DARFP-02 recarregado</p><p class="text-sm text-gray-500">30 minutos atrás</p></div></div>
+                                   <div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center"><i class="fas fa-battery-half text-yellow-600"></i></div><div class="ml-3"><p class="font-medium">VTNT-01 com bateria baixa</p><p class="text-sm text-gray-500">45 minutos atrás</p></div></div>
+                                   <div class="flex items-center border-b pb-3"><div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-600"></i></div><div class="ml-3"><p class="font-medium">Alerta de vento forte no Setor B4</p><p class="text-sm text-gray-500">1 hora atrás</p></div></div>
+                               </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-xl shadow p-5">
+                                <h2 class="text-lg font-semibold mb-4">Áreas de Risco</h2>
+                                <div class="h-[32rem] rounded-lg overflow-hidden">
+                                    <div class="map-container rounded-lg" id="riskAreaMap">
+                                        <iframe class="google-maps-iframe" src=""></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow p-5">
+                                <h2 class="text-lg font-semibold mb-4">Previsão do Tempo</h2>
+                                <div class="h-[32rem] rounded-lg overflow-hidden">
+                                    <iframe src="https://www.meteoblue.com/pt/tempo/mapas/widget?windAnimation=1&gust=0&satellite=1&cloudsAndPrecipitation=1&temperature=1&sunshine=1&extremeForecastIndex=0&geoloc=fixed&tempunit=C&windunit=km%252Fh&lengthunit=metric&zoom=17&lat=-20.839381&lon=-48.328954&autowidth=auto" frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 100%;"></iframe>
+                                </div>
+                            </div>
+                            </div>
                      </div>
                 </div>
                 <div id="realTime" class="hidden h-full">
@@ -325,6 +354,25 @@
                     }
                 }
             }
+            
+            function cycleRecentActivity() {
+                const activityList = document.getElementById('activity-list');
+                if (!activityList || activityList.children.length <= 3) {
+                    return;
+                }
+                const firstItem = activityList.firstElementChild;
+                firstItem.style.marginTop = `-${firstItem.offsetHeight}px`;
+                firstItem.style.opacity = '0';
+                setTimeout(() => {
+                    firstItem.style.transition = 'none';
+                    activityList.appendChild(firstItem);
+                    firstItem.style.marginTop = '';
+                    firstItem.style.opacity = '1';
+                    setTimeout(() => {
+                        firstItem.style.transition = 'all 0.5s ease-in-out';
+                    }, 50);
+                }, 500);
+            }
 
             document.querySelectorAll('[data-view]').forEach(view => {
                 view.addEventListener('click', function (e) {
@@ -348,13 +396,12 @@
                     mainApp.classList.remove('hidden');
                     initializeMaps();
                     showView('dashboard');
+                    setInterval(cycleRecentActivity, 5000);
                 } else { alert('Credenciais inválidas.'); }
             });
 
             document.getElementById('logoutBtn').addEventListener('click', () => {
-                mainApp.classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('loginForm').reset();
+                location.reload();
             });
 
             function initializeMaps() {
@@ -363,35 +410,33 @@
                 document.querySelector('#realTimeMap iframe').src = mapUrl;
             }
             
-            // INÍCIO DA MODIFICAÇÃO: Layout dos drones em Monitoramento mais compacto
             function renderDronesList() {
                 const container = document.getElementById('droneListContainer');
                 container.innerHTML = drones.map(drone => {
-                    const capacityInfo = drone.capacity ? `<div class="flex items-center text-xs"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>${drone.capacity}</span></div>` : '';
+                    const capacityInfo = drone.capacity ? `<div class="flex items-center text-xs whitespace-nowrap"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-1"></i><span>${drone.capacity}</span></div>` : '';
                     
                     return `
                     <div class="bg-gray-50 rounded-xl p-2 border border-gray-200">
                         <div class="flex items-center">
-                            <div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
+                            <div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center mr-2 flex-shrink-0">
                                 <i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i>
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 overflow-hidden">
                                 <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold text-sm">${drone.name}</h3>
-                                    <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span>
+                                    <h3 class="font-semibold text-sm truncate">${drone.name}</h3>
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-medium ml-2">${drone.status}</span>
                                 </div>
-                                <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-sm">
-                                    <div class="flex items-center text-xs"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
-                                    <div class="flex items-center text-xs"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
+                                <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-sm text-gray-600">
+                                    <div class="flex items-center text-xs"><i class="fas fa-battery-full text-green-500 mr-1"></i><span>${drone.battery}</span></div>
+                                    <div class="flex items-center text-xs"><i class="fas fa-clock text-gray-500 mr-1"></i><span>${drone.autonomy}</span></div>
                                     ${capacityInfo}
-                                    <div class="flex items-center text-xs"><i class="fas fa-wrench text-gray-500 mr-2"></i><span>${drone.maintenanceIn}</span></div>
+                                    <div class="flex items-center text-xs"><i class="fas fa-wrench text-gray-500 mr-1"></i><span>${drone.maintenanceIn}</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>`
                 }).join('');
             }
-            // FIM DA MODIFICAÇÃO
 
             function renderDroneMarkers() {
                 const mapContainer = document.getElementById('realTimeMap');
@@ -435,17 +480,14 @@
             function convertYoutubeUrlToEmbed(url) {
                 if (!url) return "";
                 let videoId = null;
-
                 const standardUrlPattern = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
                 const match = url.match(standardUrlPattern);
                 if (match && match[1]) {
                     videoId = match[1];
                 }
-
                 if (videoId) {
                     return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}`;
                 }
-
                 console.error("Não foi possível extrair o ID do vídeo da URL:", url);
                 return "";
             }
@@ -506,7 +548,12 @@
             });
             document.getElementById('closeHistoryModal').addEventListener('click', () => historyModal.classList.add('hidden'));
             function renderHistoryDates() {
-                historyDatesList.innerHTML = Object.keys(historyEvents).map(date => `<button data-date="${date}" class="p-3 w-40 text-center ${historyEvents[date].events.some(e=>e.type === 'fire') ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`).join('');
+                const sortedDates = Object.keys(historyEvents).sort((a, b) => {
+                    const [dayA, monthA, yearA] = a.split('/').map(Number);
+                    const [dayB, monthB, yearB] = b.split('/').map(Number);
+                    return new Date(yearB, monthB - 1, dayB) - new Date(yearA, monthA - 1, dayA);
+                });
+                historyDatesList.innerHTML = sortedDates.map(date => `<button data-date="${date}" class="p-3 w-40 text-center ${historyEvents[date].events.some(e=>e.type === 'fire') ? 'bg-red-100 hover:bg-red-200 border-red-300' : 'bg-green-100 hover:bg-green-200 border-green-300'} border rounded-lg cursor-pointer transition">${date}</button>`).join('');
             }
             
             const userForm = document.getElementById('userForm');
