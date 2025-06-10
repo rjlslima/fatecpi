@@ -124,7 +124,7 @@
                     </div>
                     <input type="password" id="password"
                         class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-secondary"
-                        placeholder="Digite sua senha" required>
+                        placeholder="Digite sua senha - fatec" required>
                 </div>
             </div>
             <button type="submit"
@@ -168,7 +168,7 @@
                     <h2 class="text-lg font-semibold mb-2 border-b pb-2">Legendas</h2>
                     <ul class="text-sm text-gray-700 space-y-2 mt-2">
                         <li><strong class="text-primary">VTNT:</strong> Veículo de Terra Não Tripulado</li>
-                        <li><strong class="text-primary">DARFP:</strong> Drone a Retardante de Fogo a Pó</li>
+                        <li><strong class="text-primary">DARFP:</strong> Drone Aéreo Retardante de Fogo a Pó</li>
                     </ul>
                 </div>
                 <nav class="flex-grow">
@@ -211,7 +211,10 @@
                 </div>
                 <div id="realTime" class="hidden h-full">
                      <div class="flex flex-col h-full gap-6">
-                         <div class="flex-shrink-0 h-1/3 bg-white shadow-lg rounded-xl p-4 overflow-y-auto"><h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2><div class="space-y-4" id="droneListContainer"></div></div>
+                         <div class="flex-shrink-0 h-1/3 bg-white shadow-lg rounded-xl p-4 overflow-y-auto">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4">Frota de Combate</h2>
+                            <div class="space-y-3" id="droneListContainer"></div>
+                        </div>
                          <div class="flex-grow h-2/3 relative rounded-xl overflow-hidden shadow-lg">
                              <div class="map-container" id="realTimeMap">
                                  <iframe class="google-maps-iframe" src=""></iframe>
@@ -271,7 +274,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let users = [ { id: 1, username: 'admin', role: 'master', password: 'admin' }, { id: 2, username: 'gerente', role: 'admin', password: 'gerente123' }, { id: 3, username: 'fatec', role: 'viewer', password: 'fatec' }];
-            let drones = [{ id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "40%", top: "32%" } }, { id: 2, name: "DARFP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "40%", top: "40%" } }, { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "20%", top: "20%" } }, { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "20%", top: "20%" } }, { id: 5, name: "DARFP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 6, name: "DARFP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" } }, { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" } }];
+            
+            // INÍCIO DA MODIFICAÇÃO: Posições dos drones online ajustadas
+            let drones = [
+                { id: 1, name: "Drone Gerencial", icon: "fas fa-cogs", iconColor: "text-gray-700", battery: "98%", autonomy: "2h", status: "online", position: { left: "45%", top: "40%" }, maintenanceIn: '45 dias' }, 
+                { id: 2, name: "DARFP-03", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "online", capacity: "75L/100L", position: { left: "50%", top: "45%" }, maintenanceIn: '28 dias' }, 
+                { id: 3, name: "VTNT-01", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "2h", status: "online", capacity: "950L/1000L", position: { left: "40%", top: "50%" }, maintenanceIn: '60 dias' }, 
+                { id: 4, name: "VTNT-02", icon: "fa-truck", iconColor: "text-blue-500", battery: "85%", autonomy: "1:30h", status: "online", capacity: "830L/1000L", position: { left: "55%", top: "50%" }, maintenanceIn: '15 dias' }, 
+                { id: 5, name: "DARFP-01", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" }, maintenanceIn: '30 dias' }, 
+                { id: 6, name: "DARFP-02", icon: "fa-fire-extinguisher", iconColor: "text-green-500", battery: "100%", autonomy: "1h", status: "stand-by", capacity: "100L/100L", position: { left: "40%", top: "40%" }, maintenanceIn: '30 dias' }, 
+                { id: 7, name: "VTNT-03", icon: "fa-truck", iconColor: "text-blue-500", battery: "100%", autonomy: "1:30h", status: "stand-by", capacity: "1000L/1000L", position: { left: "20%", top: "20%" }, maintenanceIn: '10 dias' }
+            ];
+            
             let historyEvents = { '15/10/2023': { events: [{ type: "safe", report: "Dia sem incidentes." }, { type: "safe", report: "Manutenção preventiva realizada." }], summary: "Dia sem incidentes. Manutenção preventiva concluída." }, '12/10/2023': { events: [{ type: "fire", location: "Setor A2", responseTime: "8 min", dronesInvolved: "DARFP-02, VTNT-05", resourcesUsed: "75l, 250l Água", duration: "25 min" }], summary: "1 foco de incêndio detectado e controlado." }, '05/09/2023': { events: [{ type: "fire", location: "Setor C3", responseTime: "15 min", dronesInvolved: "DARFP-01, VTNT-03", resourcesUsed: "90l, 600l Água", duration: "45 min" }], summary: "1 foco de incêndio de média intensidade. Controlado com sucesso." } };
             
             let towerVideos = {
@@ -287,10 +301,8 @@
             const historyModal = document.getElementById('historyModal');
             const userModal = document.getElementById('userModal');
             const currentTemperatureSpan = document.getElementById('currentTemperature');
-            // INÍCIO DA MODIFICAÇÃO JS
             const windSpeedSpan = document.getElementById('windSpeed');
             const windDirectionSpan = document.getElementById('windDirection');
-            // FIM DA MODIFICAÇÃO JS
 
             function showView(viewName) {
                 contentSections.forEach(section => section.classList.add('hidden'));
@@ -347,21 +359,45 @@
             function renderDronesList() {
                 const container = document.getElementById('droneListContainer');
                 container.innerHTML = drones.map(drone => `
-                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200"><div class="flex items-start"><div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4"><i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i></div><div class="flex-1"><div class="flex justify-between items-start"><h3 class="font-semibold">${drone.name}</h3><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span></div><div class="grid grid-cols-2 mt-2 gap-2 text-sm"><div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div><div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}</div></div></div></div>`
+                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                        <div class="flex items-start">
+                            <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4">
+                                <i class="fas ${drone.icon} text-2xl ${drone.iconColor}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-semibold">${drone.name}</h3>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">${drone.status}</span>
+                                </div>
+                                <div class="grid grid-cols-2 mt-2 gap-2 text-sm">
+                                    <div class="flex items-center"><i class="fas fa-battery-full text-green-500 mr-2"></i><span>${drone.battery}</span></div>
+                                    <div class="flex items-center"><i class="fas fa-clock text-gray-500 mr-2"></i><span>${drone.autonomy}</span></div>
+                                    ${drone.capacity ? `<div class="flex items-center col-span-2"><i class="fas ${drone.name.includes('VTNT') ? 'fa-truck' : 'fa-fire-extinguisher'} text-blue-500 mr-2"></i><span>Carga: ${drone.capacity}</span></div>` : ''}
+                                    <div class="flex items-center col-span-2">
+                                        <i class="fas fa-wrench text-gray-500 mr-2"></i><span>Manutenção em: ${drone.maintenanceIn}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
                 ).join('');
             }
 
+            // INÍCIO DA MODIFICAÇÃO: Apenas drones "online" são renderizados no mapa
             function renderDroneMarkers() {
                 const mapContainer = document.getElementById('realTimeMap');
                 mapContainer.querySelectorAll('.drone-marker').forEach(el => el.remove());
-                drones.forEach(drone => {
-                    const marker = document.createElement('div');
-                    marker.className = 'drone-marker';
-                    marker.style.left = drone.position.left;
-                    marker.style.top = drone.position.top;
-                    marker.innerHTML = `<div class="w-8 h-8 rounded-full ${drone.iconColor.replace('text-', 'bg-')} flex items-center justify-center border-2 border-white shadow-lg"><i class="fas ${drone.icon} text-white text-sm"></i></div>`;
-                    mapContainer.appendChild(marker);
-                });
+                
+                drones
+                    .filter(drone => drone.status === 'online') // Filtra para manter apenas os drones online
+                    .forEach(drone => {
+                        const marker = document.createElement('div');
+                        marker.className = 'drone-marker';
+                        marker.style.left = drone.position.left;
+                        marker.style.top = drone.position.top;
+                        marker.innerHTML = `<div class="w-8 h-8 rounded-full ${drone.iconColor.replace('text-', 'bg-')} flex items-center justify-center border-2 border-white shadow-lg"><i class="fas ${drone.icon} text-white text-sm"></i></div>`;
+                        mapContainer.appendChild(marker);
+                    });
             }
             
             function updateTemperature() {
@@ -372,9 +408,8 @@
             }
             setInterval(updateTemperature, 5000);
 
-            // INÍCIO DA NOVA FUNÇÃO PARA ATUALIZAR DADOS DO VENTO
             function updateWindData() {
-                const speed = (Math.random() * 25 + 5).toFixed(1); // Velocidade do vento entre 5 e 30 km/h
+                const speed = (Math.random() * 25 + 5).toFixed(1);
                 const directions = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
                 const direction = directions[Math.floor(Math.random() * directions.length)];
                 
@@ -385,27 +420,17 @@
                     windDirectionSpan.textContent = direction;
                 }
             }
-            // Chama a função para definir os valores iniciais e depois atualiza a cada 5 segundos
             updateWindData();
             setInterval(updateWindData, 5000);
-            // FIM DA NOVA FUNÇÃO
 
             function convertYoutubeUrlToEmbed(url) {
                 if (!url) return "";
                 let videoId = null;
 
-                try {
-                    const standardUrl = new URL(url);
-                    if (standardUrl.hostname === "www.youtube.com" || standardUrl.hostname === "youtube.com") {
-                        videoId = standardUrl.searchParams.get("v");
-                    } else if (standardUrl.hostname === "youtu.be") {
-                        videoId = standardUrl.pathname.slice(1);
-                    }
-                } catch (e) {
-                    const match = url.match(/youtube\.com\/([a-zA-Z0-9_-]+)/);
-                    if (match && match[1]) {
-                        videoId = match[1];
-                    }
+                const standardUrlPattern = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const match = url.match(standardUrlPattern);
+                if (match && match[1]) {
+                    videoId = match[1];
                 }
 
                 if (videoId) {
